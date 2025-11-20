@@ -1,0 +1,45 @@
+# =======================================
+# Java Build
+# =======================================
+*.class
+*.jar
+*.log
+
+# Build directories
+bin/
+build/
+target/
+out/
+
+# =======================================
+# Eclipse
+# =======================================
+.project
+.classpath
+.settings/
+.metadata/
+
+# =======================================
+# OS files
+# =======================================
+.DS_Store
+Thumbs.db
+
+# =======================================
+# Sensitive Configuration
+# =======================================
+*.env
+*.db
+database.properties
+config/
+secrets/
+
+# =======================================
+# SQL dumps to ignore
+# =======================================
+*.sql
+*.dump
+
+# BUT allow schema files
+!src/main/resources/sql/schema.sql
+!src/main/resources/sql/data.sql
