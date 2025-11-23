@@ -1,7 +1,7 @@
 package Controller;
 import Model.*;
-import interfaceDB.ManagerDB;
-import model.Medarbejder;
+import Database.*;
+import interfaceDB.*;
 
 public class ManagerController {
 	private ManagerDB ManagerDBIF;

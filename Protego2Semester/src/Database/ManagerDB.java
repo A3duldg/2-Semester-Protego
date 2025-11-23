@@ -1,6 +1,8 @@
 package Database;
 
-public class ManagerDB {
+import interfaceDB.ManagerDBIF;
+
+public class ManagerDB implements ManagerDBIF{
 
 	public static ManagerDB getInstance() {
 		return null;
