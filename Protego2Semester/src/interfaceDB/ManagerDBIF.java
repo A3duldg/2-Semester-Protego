@@ -1,9 +1,14 @@
 package interfaceDB;
-import Model.*;
-import Database.*;
+
+import Model.Manager;
+
+//Interface for Manager DB operationer.
 
 public interface ManagerDBIF {
-	Manager findActiveManager(int managerId);
 
+    Manager findManager(int managerId);
+
+    default Manager findActiveManager(int managerId) {
+        return findManager(managerId);
+    }
 }
-		
