@@ -1,10 +1,8 @@
 package Database;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import interfaceDB.ContractDBIF;
 import Model.Contract;
-import Database.DBConnection;
+
 
 public class ContractDB implements ContractDBIF {
 	
@@ -13,7 +11,9 @@ public class ContractDB implements ContractDBIF {
 	        "FROM Contract " +
 		    "WHERE contractId = ? AND active = 1";
 	private static final String CONFIRM_CONTRACT_Q =
-			"UPDATE Contract SET confirmed = 1 WHERE active = 1";
+			"UPDATE Contract " +
+			"SET confirmed = 1 " +
+			"WHERE contractId = ? AND active = 1";
 	
     private PreparedStatement findActiveContract;
     private PreparedStatement confirmContract;
@@ -26,15 +26,51 @@ public ContractDB() {
 	} 
 	 catch (Exception e) {
 		 e.printStackTrace();
+		 throw new RuntimeException("Could not intialize ContractDB", e);
 	 }
 }
 public Contract findActiveContract(int contractId) {
+	try {
+		findActiveContract.setInt(1, contractId);
+		
+		ResultSet rs = findActiveContract.executeQuery();
+		
+		if (rs.next()) {
+			return buildObject(rs);
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
+	
 	return null;
 }
+@Override
 public Contract confirmContract() {
+	try {
+		ResultSet rs = findActiveContract.executeQuery();
+		
+		if (rs.next()) {
+			int id = rs.getInt("contractId");
+			
+			confirmContract.setInt(1, id);
+			
+			int updated = confirmContract.executeUpdate();
+			
+			if (updated > 0) {
+				return new Contract(id);
+			}
+		}
+} 
+	catch (SQLException e) {
+		e.printStackTrace();
+	}
+	
 	return null;
+	
 }
-private Contract buildObject(ResultSet rs) {
+private Contract buildObject(ResultSet rs) throws SQLException {
+	int id = rs.getInt("contractId");
+	return new Contract(id);
 	
 }
 
