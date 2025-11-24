@@ -1,16 +1,17 @@
 package Controller;
-import Model.*;
-import Database.*;
-import interfaceDB.*;
+
+import interfaceDB.ManagerDBIF;
+import ManagerDB;
+import Model.Manager;
 
 public class ManagerController {
-	private ManagerDB ManagerDBIF;
+	private ManagerDBIF ManagerDB;
 
 	public ManagerController() {
-		ManagerDBIF = ManagerDB.getInstance();
+		ManagerDB = ManagerDB.getInstance();
 }
     public Manager findActiveManager(int managerId) {
-        return ManagerDB.getManager(managerId);
+        return ManagerDB.findActiveManager(managerId);
     }
 	
 }
