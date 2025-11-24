@@ -3,7 +3,7 @@ package Model;
 import java.util.ArrayList;
 
 public class Shift {
-	private static int nextId = 10001;
+
 
 	private int startTime;
 	private int endTime;
@@ -21,7 +21,7 @@ public class Shift {
 		this.guardAmount = guardAmount;
 		this.shiftLocation = shiftLocation;
 		this.availability = availability;
-		this.shiftId = generateShiftId();
+		this.shiftId = shiftId;
 
 		// initialisering af certifications listen & hard coding af brand vagt typen
 		certifications = new ArrayList<>();
@@ -43,10 +43,7 @@ public class Shift {
 	public String getType() {
 		return type;
 	}
-	// opretter den næste id i rækken for shifts.
-	public int generateShiftId() {
-		return ++nextId;
-	}
+
 
 	// getter til shiftId.
 	public  int getShiftId() {
