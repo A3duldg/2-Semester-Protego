@@ -62,7 +62,7 @@ public class EmployeeLogin extends JFrame {
 
 		JMenuItem mntmHelp = new JMenuItem("Help");
 		mnOptions.add(mntmHelp);
-		contentPane = new JPanel();
+		contentPane = new GradientPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
