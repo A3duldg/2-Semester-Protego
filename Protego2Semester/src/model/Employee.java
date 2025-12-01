@@ -24,7 +24,7 @@ this.email = email;
 
 
 	}
-
+// bare en almen adder til en liste af vagter en employee har.
  public void connectShiftToEmployee(Shift shift) {
 	 if (shift == null)
 		 throw new IllegalArgumentException("må ikke være null");
