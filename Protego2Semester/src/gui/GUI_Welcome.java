@@ -15,6 +15,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.border.LineBorder;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.Dimension;
 
 public class GUI_Welcome extends JFrame {
 
@@ -74,6 +78,10 @@ public class GUI_Welcome extends JFrame {
 		contentPane.add(panelManagerLogin);
 		
 		JButton btnManagerLogin = new JButton("Manager Login");
+		btnManagerLogin.setFocusPainted(false);
+		btnManagerLogin.setForeground(new Color(255, 255, 255));
+		btnManagerLogin.setBackground(new Color(0, 0, 0, 0));
+		btnManagerLogin.setOpaque(false);
 		btnManagerLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ManagerLogin ml = new ManagerLogin();
@@ -86,15 +94,20 @@ public class GUI_Welcome extends JFrame {
 		panelEmployeeLogin.setOpaque(false);
 		contentPane.add(panelEmployeeLogin);
 		
-		JButton btnNewButton = new JButton("Employee Login");
+		JButton btnEmployeeLogin = new JButton("Employee Login");
+		btnEmployeeLogin.setOpaque(false);
+		btnEmployeeLogin.setFocusPainted(false);
+		btnEmployeeLogin.setForeground(new Color(255, 255, 255));
+		btnEmployeeLogin.setBackground(new Color(0, 0, 0, 0));
+	
 		
-		btnNewButton.addActionListener(new ActionListener() {
+		btnEmployeeLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				EmployeeLogin el = new EmployeeLogin();
 				el.setVisible(true);
 			}
 		});
-		panelEmployeeLogin.add(btnNewButton);
+		panelEmployeeLogin.add(btnEmployeeLogin);
 
 	}
 
