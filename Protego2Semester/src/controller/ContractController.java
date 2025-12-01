@@ -1,7 +1,7 @@
-package Controller;
+package controller;
 import interfaceDB.ContractDBIF;
-import Database.ContractDB;
-import Model.Contract;
+import model.Contract;
+import database.ContractDB;
 
 public class ContractController {
 	private ContractDBIF contractDB;

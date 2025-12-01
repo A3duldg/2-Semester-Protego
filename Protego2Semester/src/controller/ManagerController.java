@@ -1,8 +1,8 @@
-package Controller;
+package controller;
 
 import interfaceDB.ManagerDBIF;
-import Database.ManagerDB;
-import Model.Manager;
+import model.Manager;
+import database.ManagerDB;
 
 
 public class ManagerController {

@@ -1,10 +1,10 @@
-package Controller;
+package controller;
 
 import interfaceDB.ShiftDBIF;
-import Model.Contract;
-import Model.Manager;
-import Model.Shift;
-import Database.ShiftDB;
+import model.Contract;
+import model.Manager;
+import model.Shift;
+import database.ShiftDB;
 
 public class ShiftController {
 	private ManagerController managerCtr;

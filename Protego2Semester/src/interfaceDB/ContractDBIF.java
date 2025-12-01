@@ -1,5 +1,5 @@
 package interfaceDB;
-import Model.Contract;
+import model.Contract;
 
 public interface ContractDBIF {
 	

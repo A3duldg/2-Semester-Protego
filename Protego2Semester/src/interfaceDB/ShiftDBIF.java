@@ -1,7 +1,7 @@
 package interfaceDB;
 
 
-import Model.Shift;
+import model.Shift;
 
 public interface ShiftDBIF {
 	int createShift(Shift shift);

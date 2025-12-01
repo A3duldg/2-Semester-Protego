@@ -1,7 +1,8 @@
-package Database;
+package database;
 
 import interfaceDB.ManagerDBIF;
-import Model.Manager;
+import model.Manager;
+
 import java.sql.*;
 
 public class ManagerDB implements ManagerDBIF {

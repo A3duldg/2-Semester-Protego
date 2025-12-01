@@ -1,6 +1,6 @@
 package interfaceDB;
 
-import Model.Manager;
+import model.Manager;
 
 //Interface for Manager DB operationer.
 

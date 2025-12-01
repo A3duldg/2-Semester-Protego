@@ -1,12 +1,12 @@
-package Database;
+package database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import Model.Shift;
 import interfaceDB.ShiftDBIF;
+import model.Shift;
 
 
 public class ShiftDB implements ShiftDBIF {
