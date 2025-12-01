@@ -3,13 +3,24 @@ package Database;
 import java.sql.*;
 
 public class DBConnection {
-	private static DBConnection instance;
+	/*private static DBConnection instance;
 	private Connection connection = null;
 	private static final String DBNAME = "studentgroup";
 	private static final String SERVERNAME = "localhost";
 	private static final String PORTNUMBER = "1433";
 	private static final String USERNAME = "sa";
-	private static final String PASSWORD = "secret2025*";
+	private static final String PASSWORD = "secret2025*";*/
+	
+	
+	//Skal ændres til hildur serveren på et eller andet tidspunkt
+	
+	private static DBConnection instance;
+	private Connection connection = null;
+	private static final String DBNAME = "Protego_system";
+	private static final String SERVERNAME = "localhost";
+	private static final String PORTNUMBER = "1433";
+	private static final String USERNAME = "sa";
+	private static final String PASSWORD = "Secret2025*";
 
 	private DBConnection() {
 		String urlString = String.format("jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false", SERVERNAME, PORTNUMBER,
