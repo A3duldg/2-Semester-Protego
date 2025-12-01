@@ -1,6 +1,7 @@
 package GUI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -59,12 +60,17 @@ public class GUI_Welcome extends JFrame {
 		setContentPane(contentPane);
 		
 		JPanel panelIntroductionText = new JPanel();
+		panelIntroductionText.setOpaque(false);
 		contentPane.add(panelIntroductionText);
 		
 		JLabel lblWelcome = new JLabel("Welcome, please select a login type");
+		lblWelcome.setOpaque(false);
+		lblWelcome.setForeground(Color.WHITE);
+		lblWelcome.setInheritsPopupMenu(false);
 		panelIntroductionText.add(lblWelcome);
 		
 		JPanel panelManagerLogin = new JPanel();
+		panelManagerLogin.setOpaque(false);
 		contentPane.add(panelManagerLogin);
 		
 		JButton btnManagerLogin = new JButton("Manager Login");
@@ -77,9 +83,11 @@ public class GUI_Welcome extends JFrame {
 		panelManagerLogin.add(btnManagerLogin);
 		
 		JPanel panelEmployeeLogin = new JPanel();
+		panelEmployeeLogin.setOpaque(false);
 		contentPane.add(panelEmployeeLogin);
 		
 		JButton btnNewButton = new JButton("Employee Login");
+		
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				EmployeeLogin el = new EmployeeLogin();

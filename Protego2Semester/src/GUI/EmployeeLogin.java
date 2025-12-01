@@ -68,6 +68,7 @@ public class EmployeeLogin extends JFrame {
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 		panel.setToolTipText("Employee id");
 		contentPane.add(panel);
 
@@ -98,6 +99,7 @@ public class EmployeeLogin extends JFrame {
 		tfEmployeeId.setColumns(10);
 
 		JPanel panel_2 = new JPanel();
+		panel_2.setOpaque(false);
 		contentPane.add(panel_2);
 
 		tfPassword = new JTextField();
@@ -124,6 +126,7 @@ public class EmployeeLogin extends JFrame {
 		tfPassword.setColumns(10);
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setOpaque(false);
 		contentPane.add(panel_1);
 		
 		JButton btnNewButton = new JButton("Login");
