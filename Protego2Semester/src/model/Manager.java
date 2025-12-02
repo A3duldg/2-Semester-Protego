@@ -26,4 +26,29 @@ private String email;
 	public int getManager() {
 		return managerId;
 	}
+	
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public String getLatName() {
+		return lastName;
+	}
+	
+	public String getAdress() {
+		return adress;
+	}
+	
+	public String getCity() {
+		return city;
+	}
+	public int getPostalNr() {
+		return postalNr;
+	}
+	public int getPhone() {
+		return phone;
+	}
+	public String getEmail() {
+		return email;
+	}
 }
