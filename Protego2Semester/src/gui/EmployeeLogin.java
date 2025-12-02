@@ -19,6 +19,8 @@ import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -73,10 +75,15 @@ public class EmployeeLogin extends JFrame {
 		contentPane.add(panel);
 
 		tfEmployeeId = new JTextField();
+		tfEmployeeId.setText("Employee ID");
+		tfEmployeeId.setForeground(Color.GRAY);
+		tfEmployeeId.setHorizontalAlignment(SwingConstants.CENTER);
+		tfEmployeeId.setColumns(10);
+		panel.add(tfEmployeeId);
 		tfEmployeeId.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (tfEmployeeId.getText().equals("Employee Id")) {
+				if (tfEmployeeId.getText().equals("Employee ID")) {
 					tfEmployeeId.setText("");
 					tfEmployeeId.setForeground(Color.BLACK);
 				}
@@ -85,24 +92,23 @@ public class EmployeeLogin extends JFrame {
 			@Override
 			public void focusLost(FocusEvent e) {
 				if (tfEmployeeId.getText().isEmpty()) {
-					tfEmployeeId.setText("Employee Id");
+					tfEmployeeId.setText("Employee ID");
 					tfEmployeeId.setForeground(Color.GRAY);
 
 				}
 			}
 		});
-		tfEmployeeId.setToolTipText("");
-		tfEmployeeId.setCaretColor(new Color(255, 255, 255));
-		tfEmployeeId.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		tfEmployeeId.setHorizontalAlignment(SwingConstants.CENTER);
-		panel.add(tfEmployeeId);
-		tfEmployeeId.setColumns(10);
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setOpaque(false);
 		contentPane.add(panel_2);
 
 		tfPassword = new JTextField();
+		tfPassword.setText("Password");
+		tfPassword.setForeground(Color.GRAY);
+		tfPassword.setHorizontalAlignment(SwingConstants.CENTER);
+		tfPassword.setColumns(10);
+		panel_2.add(tfPassword);
 		tfPassword.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -114,16 +120,14 @@ public class EmployeeLogin extends JFrame {
 
 			@Override
 			public void focusLost(FocusEvent e) {
+				
 				if (tfPassword.getText().isEmpty()) {
 					tfPassword.setText("Password");
 					tfPassword.setForeground(Color.GRAY);
-
 				}
 			}
 		});
-		tfPassword.setHorizontalAlignment(SwingConstants.CENTER);
-		panel_2.add(tfPassword);
-		tfPassword.setColumns(10);
+	
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setOpaque(false);
@@ -131,6 +135,10 @@ public class EmployeeLogin extends JFrame {
 		
 		JButton btnNewButton = new JButton("Login");
 		panel_1.add(btnNewButton);
+		SwingUtilities.invokeLater(() -> btnNewButton.requestFocusInWindow());
+
+	
+
 
 	}
 
