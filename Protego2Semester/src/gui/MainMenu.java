@@ -20,7 +20,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.Dimension;
 
-public class GUI_Welcome extends JFrame {
+public class MainMenu extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
@@ -32,7 +32,7 @@ public class GUI_Welcome extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GUI_Welcome frame = new GUI_Welcome();
+					MainMenu frame = new MainMenu();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -44,7 +44,7 @@ public class GUI_Welcome extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public GUI_Welcome() {
+	public MainMenu() {
 		setTitle("Protego Security Aps - System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 513, 369);
@@ -59,6 +59,11 @@ public class GUI_Welcome extends JFrame {
 		
 		JMenuItem mntmHelp = new JMenuItem("Help");
 		mnOptions.add(mntmHelp);
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener((e) -> System.exit(0));
+		mntmExit.add(mntmExit);
+		
 		contentPane = new GradientPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
