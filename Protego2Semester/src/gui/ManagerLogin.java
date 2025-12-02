@@ -8,11 +8,16 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Dimension;
 import javax.swing.border.LineBorder;
+
+import controller.LoginValidator;
+
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.BorderLayout;
@@ -25,13 +30,16 @@ import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JPasswordField;
 
 public class ManagerLogin extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-	private JTextField tfEmployeeId;
-	private JTextField tfPassword;
+	private JTextField tfManagerId;
+	private JPasswordField passwordField;
 
 	/**
 	 * Launch the application.
@@ -69,76 +77,88 @@ public class ManagerLogin extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 
-		JPanel panel = new JPanel();
-		panel.setOpaque(false);
-		panel.setToolTipText("Employee id");
-		contentPane.add(panel);
+		JPanel panel_ID = new JPanel();
+		panel_ID.setOpaque(false);
+		panel_ID.setToolTipText("Manager ID");
+		contentPane.add(panel_ID);
 
-		tfEmployeeId = new JTextField();
-		tfEmployeeId.setText("Employee ID");
-		tfEmployeeId.setForeground(Color.GRAY);
-		tfEmployeeId.setHorizontalAlignment(SwingConstants.CENTER);
-		tfEmployeeId.setColumns(10);
-		panel.add(tfEmployeeId);
-		tfEmployeeId.addFocusListener(new FocusAdapter() {
+		tfManagerId = new JTextField();
+		tfManagerId.setText("Manager ID");
+		tfManagerId.setForeground(Color.GRAY);
+		tfManagerId.setHorizontalAlignment(SwingConstants.CENTER);
+		tfManagerId.setColumns(10);
+		panel_ID.add(tfManagerId);
+		tfManagerId.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
-				if (tfEmployeeId.getText().equals("Manager ID")) {
-					tfEmployeeId.setText("");
-					tfEmployeeId.setForeground(Color.BLACK);
+				if (tfManagerId.getText().equals("Manager ID")) {
+					tfManagerId.setText("");
+					tfManagerId.setForeground(Color.BLACK);
 				}
 			}
 
 			@Override
 			public void focusLost(FocusEvent e) {
-				if (tfEmployeeId.getText().isEmpty()) {
-					tfEmployeeId.setText("Manager ID");
-					tfEmployeeId.setForeground(Color.GRAY);
+				if (tfManagerId.getText().isEmpty()) {
+					tfManagerId.setText("Manager ID");
+					tfManagerId.setForeground(Color.GRAY);
 
 				}
 			}
 		});
 
-		JPanel panel_2 = new JPanel();
-		panel_2.setOpaque(false);
-		contentPane.add(panel_2);
+		JPanel panel_Password = new JPanel();
+		panel_Password.setOpaque(false);
+		contentPane.add(panel_Password);
 
-		tfPassword = new JTextField();
-		tfPassword.setText("Password");
-		tfPassword.setForeground(Color.GRAY);
-		tfPassword.setHorizontalAlignment(SwingConstants.CENTER);
-		tfPassword.setColumns(10);
-		panel_2.add(tfPassword);
-		tfPassword.addFocusListener(new FocusAdapter() {
+		passwordField = new JPasswordField();
+		passwordField.setText("Password");
+		passwordField.setEchoChar((char) 0);
+		passwordField.setForeground(Color.GRAY);
+		passwordField.setHorizontalAlignment(SwingConstants.CENTER);
+		passwordField.setColumns(10);
+		panel_Password.add(passwordField);
+
+		passwordField.addFocusListener(new FocusAdapter() {
 			@Override
-			public void focusGained(FocusEvent e) {
-				if (tfPassword.getText().equals("Password")) {
-					tfPassword.setText("");
-					tfPassword.setForeground(Color.BLACK);
-				}
+			public void focusGained(FocusEvent e) { // checks for the box in focus
+				passwordField.setText("");
+				passwordField.setEchoChar('*'); // We put the masking back on
+				passwordField.setForeground(Color.BLACK);
 			}
 
 			@Override
-			public void focusLost(FocusEvent e) {
-				
-				if (tfPassword.getText().isEmpty()) {
-					tfPassword.setText("Password");
-					tfPassword.setForeground(Color.GRAY);
+			public void focusLost(FocusEvent e) { // checks for when the box is out of focus
+
+				if (passwordField.getPassword().length == 0) { // We have the if statement check that the box is empty
+					passwordField.setText("Password"); // Here we set the placeholder text to say password
+					passwordField.setEchoChar((char) 0); // Here we turn the masking off so the user can see the text
+					passwordField.setForeground(Color.BLACK);
 				}
 			}
 		});
-	
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setOpaque(false);
-		contentPane.add(panel_1);
-		
+		JPanel panel_Button = new JPanel();
+		panel_Button.setOpaque(false);
+		contentPane.add(panel_Button);
+
 		JButton btnNewButton = new JButton("Login");
-		panel_1.add(btnNewButton);
+		LoginValidator validator = new LoginValidator();
+		btnNewButton.addActionListener(e -> {
+			String id = tfManagerId.getText(); // get text from id field
+			String password = new String(passwordField.getPassword()); // gets the password as a string
+			boolean ok = validator.validate(id, password); // uses our validator method from LoginValidator to check if
+															// the password and id matches
+			if (ok) {
+				JOptionPane.showMessageDialog(panel_ID, "Login success!");
+			} else {
+				JOptionPane.showMessageDialog(panel_ID, "Invalid ID/Password.");
+			}
+
+		});
+
+		panel_Button.add(btnNewButton);
 		SwingUtilities.invokeLater(() -> btnNewButton.requestFocusInWindow());
-
-	
-
 
 	}
 
