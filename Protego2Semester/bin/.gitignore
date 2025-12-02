@@ -1,10 +1,8 @@
-/GUI/
 /Resources/
 /controller/
 /database/
+/gui/
 /interfaceDB/
 /model/
-/Controller/
-/Database/
-/Model/
-/gui/
+/module-info.class
+/test1/
