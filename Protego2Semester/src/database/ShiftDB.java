@@ -28,7 +28,7 @@ public class ShiftDB implements ShiftDBIF {
 	private static final String BOOK_SHIFT_Q = "UPDATE Shift" + "SET availability = 0" + "WHERE shiftId = ?";
 	// jeg ved ikke helt hvordan jeg skal fikse det nu har bare skrevet den ind for nu
 	//private static final String CONFIRM_SHIFT_Q = "UPDATE Shift" + "WHERE shiftId = ? AND availability = 0";
-	public ShiftDB() {
+	public ShiftDB() throws DataAccessException {
 		try {
 			this.con = DBConnection.getInstance().getConnection();
 			
@@ -38,6 +38,7 @@ public class ShiftDB implements ShiftDBIF {
 			bookShiftStms = con.prepareStatement(BOOK_SHIFT_Q);
 	} 		catch (SQLException e) {
 				e.printStackTrace();
+				throw new DataAccessException("Failed to initialize ShiftDB", e);
 	}
 
 }

@@ -7,6 +7,7 @@ import model.Shift;
 
 import java.util.List;
 
+import database.DataAccessException;
 import database.ShiftDB;
 
 public class ShiftController {
@@ -14,7 +15,7 @@ public class ShiftController {
 	private ContractController contractCtr;
 	private ShiftDBIF shiftDB;
 
-	public ShiftController() {
+	public ShiftController() throws DataAccessException{
 		shiftDB = new ShiftDB();
 	}
 
@@ -22,7 +23,7 @@ public class ShiftController {
 		return contractCtr.findActiveContract(0);
 	}
 
-	public Manager findActiveManager() {
+	public Manager findActiveManager() throws DataAccessException{
 		return managerCtr.findActiveManager(0);
 	}
 

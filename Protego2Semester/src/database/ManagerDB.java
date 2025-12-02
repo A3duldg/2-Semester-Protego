@@ -9,7 +9,7 @@ public class ManagerDB implements ManagerDBIF {
 
     private final DBConnection db;
 
-    public ManagerDB() {
+    public ManagerDB() throws DataAccessException{
         db = DBConnection.getInstance();
     }
 
