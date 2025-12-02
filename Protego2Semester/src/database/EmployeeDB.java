@@ -1,6 +1,8 @@
 package database;
 
 import java.sql.*;
+import java.util.ArrayList;
+
 import interfaceDB.EmployeeDBIF;
 import model.Employee;
 import model.Shift;
@@ -46,6 +48,21 @@ public class EmployeeDB implements EmployeeDBIF {
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
+	}
+	@SuppressWarnings("unused")
+	private Employee buildObject(ResultSet rs) throws SQLException {
+	    Employee employee = new Employee(
+	        rs.getInt("employeeId"),
+	        rs.getString("firstName"),
+	        rs.getString("lastName"),
+	        rs.getString("adress"),
+	        rs.getString("city"),
+	        rs.getInt("postalNr"),
+	        rs.getInt("phone"),
+	        rs.getString("email")
+	    );
+
+	    return employee;
 	}
 	
 }

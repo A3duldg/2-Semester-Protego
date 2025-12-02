@@ -13,8 +13,7 @@ public class Employee {
 	private String email;
 	private ArrayList<Shift> shifts = new ArrayList<>();
 
-	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,
-			int phone, String email) {
+	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,int phone, String email) {
 		this.employeeId = employeeId;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -23,6 +22,7 @@ public class Employee {
 		this.postalNr = postalNr;
 		this.phone = phone;
 		this.email = email;
+		this.shifts = new ArrayList<>();
 
 	}
 
