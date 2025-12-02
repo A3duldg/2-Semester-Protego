@@ -59,6 +59,11 @@ public class MainMenu extends JFrame {
 		
 		JMenuItem mntmHelp = new JMenuItem("Help");
 		mnOptions.add(mntmHelp);
+		
+		JMenuItem mntmExit = new JMenuItem("Exit");
+		mntmExit.addActionListener((e) -> System.exit(0));
+		mntmExit.add(mntmExit);
+		
 		contentPane = new GradientPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
