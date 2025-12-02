@@ -1,8 +1,5 @@
-/Resources/
-/controller/
-/database/
-/gui/
-/interfaceDB/
 /model/
-/module-info.class
-/test1/
+/database/
+/interfaceDB/
+/gui/
+/controller/
