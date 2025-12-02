@@ -143,13 +143,11 @@ public class ManagerLogin extends JFrame {
 		contentPane.add(panel_Button);
 
 		JButton btnNewButton = new JButton("Login");
-		LoginValidator validator = new LoginValidator();
 		btnNewButton.addActionListener(e -> {
 			String id = tfManagerId.getText(); // get text from id field
-			String password = new String(passwordField.getPassword()); // gets the password as a string
-			boolean ok = validator.validate(id, password); // uses our validator method from LoginValidator to check if
+			LoginValidator validator = new LoginValidator();
 															// the password and id matches
-			if (ok) {
+			if (validator.validate(id)) {
 				JOptionPane.showMessageDialog(panel_ID, "Login success!");
 			} else {
 				JOptionPane.showMessageDialog(panel_ID, "Invalid ID/Password.");
