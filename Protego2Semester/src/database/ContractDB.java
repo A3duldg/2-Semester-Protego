@@ -18,7 +18,8 @@ public class ContractDB implements ContractDBIF {
     private PreparedStatement findActiveContract;
     private PreparedStatement confirmContract;
 
-public ContractDB() {	
+
+    public ContractDB() {	
 	try { Connection con = DBConnection.getInstance().getConnection();
 	
 	findActiveContract = con.prepareStatement(FIND_ACTIVE_CONTRACT_Q);

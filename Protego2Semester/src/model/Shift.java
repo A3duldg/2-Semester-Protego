@@ -12,6 +12,7 @@ public class Shift {
 	private String type;
 	private boolean availability;
 	private int shiftId;
+	private boolean confirmed;
 
 	private ArrayList<String> certifications;
 
@@ -22,6 +23,7 @@ public class Shift {
 		this.shiftLocation = shiftLocation;
 		this.availability = availability;
 		this.shiftId = shiftId;
+		this.confirmed = false;
 
 		// initialisering af certifications listen & hard coding af brand vagt typen
 		certifications = new ArrayList<>();
@@ -61,7 +63,7 @@ public class Shift {
 		return certifications;
 
 	}
-
+	
 	public int getStartTime() {
 		return startTime;
 	}
@@ -94,12 +96,22 @@ public class Shift {
 		this.shiftLocation = shiftLocation;
 	}
 
-	public boolean isAvailability() {
+	public boolean isAvailable() {
 		return availability;
 	}
 
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
 	}
-
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+	public boolean bookShift() {
+		if (availability) {
+			availability = false;
+			return true;
+		}
+		return false;
+	}
+	
 }
