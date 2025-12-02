@@ -22,8 +22,11 @@ private String email;
 		this.email = email;
 		
 	}
+	
+	//Test manager
+	Manager testmanager = new Manager(1,"Hans","Hansen","Testvej 17", "Aarhus", 8000,12345678,"HH@test.dk");
 
-	public int getManager() {
+	public int getManagerId() {
 		return managerId;
 	}
 	

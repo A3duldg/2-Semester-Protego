@@ -14,6 +14,6 @@ public class ManagerController {
         }
 
     public Manager findActiveManager(int managerId) {
-        return managerDB.findManager(managerId);
+        return managerDB.findManagerId(managerId);
     }
 }

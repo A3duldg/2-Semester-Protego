@@ -6,9 +6,9 @@ import model.Manager;
 
 public interface ManagerDBIF {
 
-    Manager findManager(int managerId);
+    Manager findManagerId(int managerId);
 
     default Manager findActiveManager(int managerId) {
-        return findManager(managerId);
+        return findManagerId(managerId);
     }
 }

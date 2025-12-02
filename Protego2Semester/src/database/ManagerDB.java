@@ -14,7 +14,7 @@ public class ManagerDB implements ManagerDBIF {
     }
 
     @Override
-    public Manager findManager(int managerId) {
+    public Manager findManagerId(int managerId) {
         Manager manager = null;
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -55,6 +55,6 @@ public class ManagerDB implements ManagerDBIF {
     @Override
     public Manager findActiveManager(int managerId) {
         // Example: if you want to check an "active" flag, extend SQL above.
-        return findManager(managerId);
+        return findManagerId(managerId);
     }
 }
