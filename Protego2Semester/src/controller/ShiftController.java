@@ -23,27 +23,27 @@ public class ShiftController {
 		return contractCtr.findActiveContract(0);
 	}
 
-	public Manager findActiveManager() throws DataAccessException{
+	public Manager findActiveManager() {
 		return managerCtr.findActiveManager(0);
 	}
 
-	public int createShift(Shift shift) {
+	public int createShift(Shift shift) throws DataAccessException {
 
 		return shiftDB.createShift(shift);
 
 	}
 
-	public boolean setShiftType(Shift shift) {
+	public boolean setShiftType(Shift shift) throws DataAccessException {
 		return shiftDB.setShiftType(shift);
 	}
 
 	public Contract confirmContract() {
 		return contractCtr.confirmContract();
 	}
-	boolean bookShift(Shift shift) {
+	boolean bookShift(Shift shift) throws DataAccessException {
 		return shiftDB.bookShift(shift);
 	}
-	List<Shift> findShiftByAvailability(boolean Availability) {
+	List<Shift> findShiftByAvailability(boolean Availability) throws DataAccessException {
 		return shiftDB.findShiftByAvailability(Availability);
 	}
 
