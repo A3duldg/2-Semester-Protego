@@ -11,6 +11,7 @@ public class ManagerDB implements ManagerDBIF {
 
     public ManagerDB() throws DataAccessException{
         db = DBConnection.getInstance();
+    
     }
 
     @Override
