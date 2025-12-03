@@ -9,7 +9,7 @@ public class DBConnection {
 	private Connection connection = null;
 	private static DBConnection dbConnection;
 
-	private static final String DBNAME = "company";
+	private static final String DBNAME = "Protego_system";
 	private static final String SERVERNAME = "localhost";
 	private static final int PORTNUMBER = 1433;
 	private static final String USERNAME = "sa";

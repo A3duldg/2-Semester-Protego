@@ -21,11 +21,11 @@ public class ShiftController {
 		shiftDB = new ShiftDB();
 	}
 
-	public Contract findActiveContract() {
+	public Contract findActiveContract() throws DataAccessException {
 		return contractCtr.findActiveContract(0);
 	}
 
-	public Manager findActiveManager() {
+	public Manager findActiveManager() throws DataAccessException {
 		return managerCtr.findActiveManager(0);
 	}
 
@@ -39,7 +39,7 @@ public class ShiftController {
 		return shiftDB.setShiftType(shift);
 	}
 
-	public Contract confirmContract() {
+	public Contract confirmContract() throws DataAccessException {
 		return contractCtr.confirmContract();
 	}
 	boolean bookShift(Shift shift) throws DataAccessException {
