@@ -17,6 +17,7 @@ import java.awt.Dimension;
 import javax.swing.border.LineBorder;
 
 import controller.LoginValidator;
+import database.DataAccessException;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -137,7 +138,7 @@ public class ManagerLogin extends JFrame {
 				}
 			}
 		});
-		
+
 		JPanel panel_Button = new JPanel();
 		panel_Button.setOpaque(false);
 		contentPane.add(panel_Button);
@@ -145,12 +146,19 @@ public class ManagerLogin extends JFrame {
 		JButton btnNewButton = new JButton("Login");
 		btnNewButton.addActionListener(e -> {
 			String id = tfManagerId.getText(); // get text from id field
-			LoginValidator validator = new LoginValidator();
-															// the password and id matches
-			if (validator.validate(id)) {
-				JOptionPane.showMessageDialog(panel_ID, "Login success!");
-			} else {
-				JOptionPane.showMessageDialog(panel_ID, "Invalid ID/Password.");
+			String password = new String(passwordField.getPassword()); // get password from field
+
+			try {
+				LoginValidator validator = new LoginValidator();
+				boolean success = validator.validate(id);
+				// the password and id matches
+				if (success) {
+					JOptionPane.showMessageDialog(panel_ID, "Login success!");
+				} else {
+					JOptionPane.showMessageDialog(panel_ID, "Invalid ID/Password.");
+				}
+			} catch (DataAccessException dae) {
+				JOptionPane.showMessageDialog(ManagerLogin.this, "Database Error");
 			}
 
 		});
