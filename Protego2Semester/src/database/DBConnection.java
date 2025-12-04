@@ -8,6 +8,12 @@ import database.DataAccessException;
 public class DBConnection {
 	private Connection connection = null;
 	private static DBConnection dbConnection;
+	
+	/*private static final String DBNAME = "DMA-CSD-V252_10666000";
+	private static final String SERVERNAME = "hildur.ucn.dk";
+	private static final int PORTNUMBER = 1433;
+	private static final String USERNAME = "DMA-CSD-V252_10666000";
+	private static final String PASSWORD = "Password1!"; */
 
 	private static final String DBNAME = "Protego_system";
 	private static final String SERVERNAME = "localhost";

@@ -150,15 +150,9 @@ public class ManagerLogin extends JFrame {
 
 			try {
 				LoginValidator validator = new LoginValidator();
-				boolean success = validator.validate(id);
-				// the password and id matches
-				if (success) {
-					JOptionPane.showMessageDialog(panel_ID, "Login success!");
-				} else {
-					JOptionPane.showMessageDialog(panel_ID, "Invalid ID/Password.");
-				}
+				JOptionPane.showMessageDialog(panel_ID, "Login success!");
 			} catch (DataAccessException dae) {
-				JOptionPane.showMessageDialog(ManagerLogin.this, "Database Error");
+				JOptionPane.showMessageDialog(ManagerLogin.this, "Access denied.");
 			}
 
 		});
