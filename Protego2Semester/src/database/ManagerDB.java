@@ -7,55 +7,55 @@ import java.sql.*;
 
 public class ManagerDB implements ManagerDBIF {
 
-    private final DBConnection db;
+	private final DBConnection db;
 
-    public ManagerDB() throws DataAccessException{
-        db = DBConnection.getInstance();
-    
-    }
+	public ManagerDB() throws DataAccessException {
+		db = DBConnection.getInstance();
 
-    @Override
-    public Manager findManagerId(int managerId) {
-        Manager manager = null;
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+	}
 
-        try {
-            conn = db.getConnection();
+	@Override
+	public Manager findManagerId(int managerId) {
+		Manager manager = null;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 
-            String sql = "SELECT managerId, firstName, lastName, address, city, postalNr, phone, email " +
-                         "FROM Manager WHERE managerId = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, managerId);
-            rs = stmt.executeQuery();
+		try {
+			conn = db.getConnection();
 
-            if (rs.next()) {
-                manager = new Manager(
-                        rs.getInt("managerId"),
-                        rs.getString("firstName"),
-                        rs.getString("lastName"),
-                        rs.getString("address"),
-                        rs.getString("city"),
-                        rs.getInt("postalNr"),
-                        rs.getInt("phone"),
-                        rs.getString("email")
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // Close resources and return connection to pool
-            try { if (rs != null) rs.close(); } catch (Exception ignored) {}
-            try { if (stmt != null) stmt.close(); } catch (Exception ignored) {}
-        }
+			String sql = "SELECT managerId, firstName, lastName, address, city, postalNr, phone, email FROM Manager WHERE managerId = ?";
+			stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, managerId);
+			rs = stmt.executeQuery();
 
-        return manager;
-    }
+			if (rs.next()) {
+				manager = new Manager(rs.getInt("managerId"), rs.getString("firstName"), rs.getString("lastName"),
+						rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getInt("phone"),
+						rs.getString("email"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			// Close resources and return connection to pool
+			try {
+				if (rs != null)
+					rs.close();
+			} catch (Exception ignored) {
+			}
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (Exception ignored) {
+			}
+		}
 
-    @Override
-    public Manager findActiveManager(int managerId) {
-        // Example: if you want to check an "active" flag, extend SQL above.
-        return findManagerId(managerId);
-    }
+		return manager;
+	}
+
+	@Override
+	public Manager findActiveManager(int managerId) {
+		// Example: if you want to check an "active" flag, extend SQL above.
+		return findManagerId(managerId);
+	}
 }

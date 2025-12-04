@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Shift {
 
-
 	private int startTime;
 	private int endTime;
 	private int guardAmount;
@@ -12,7 +11,6 @@ public class Shift {
 	private String type;
 	private boolean availability;
 	private int shiftId;
-	private boolean confirmed;
 
 	private ArrayList<String> certifications;
 
@@ -23,7 +21,7 @@ public class Shift {
 		this.shiftLocation = shiftLocation;
 		this.availability = availability;
 		this.shiftId = shiftId;
-		this.confirmed = false;
+		
 
 		// initialisering af certifications listen & hard coding af brand vagt typen
 		certifications = new ArrayList<>();
@@ -46,9 +44,8 @@ public class Shift {
 		return type;
 	}
 
-
 	// getter til shiftId.
-	public  int getShiftId() {
+	public int getShiftId() {
 		return shiftId;
 	}
 
@@ -63,7 +60,7 @@ public class Shift {
 		return certifications;
 
 	}
-	
+
 	public int getStartTime() {
 		return startTime;
 	}
@@ -103,9 +100,7 @@ public class Shift {
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
 	}
-	public boolean isConfirmed() {
-		return confirmed;
-	}
+
 	public boolean bookShift() {
 		if (availability) {
 			availability = false;
@@ -113,5 +108,5 @@ public class Shift {
 		}
 		return false;
 	}
-	
+
 }
