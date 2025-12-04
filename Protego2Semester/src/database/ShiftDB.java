@@ -18,16 +18,15 @@ public class ShiftDB implements ShiftDBIF {
 	private PreparedStatement bookShiftStms;
 	// private PreparedStatement confirmShiftStms;
 
-	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, shiftType, availability"
-			+ "FROM Shift" + "WHERE availability = 1";
+	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, shiftType, availability FROM Shift WHERE availability = 1";
 
 	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, shiftType, availability) VALUES (?, ?, ?, ?, ?, ?)";
 
-	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift" + "SET shiftType = ?" + "WHERE shiftId = ?";
+	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET shiftType = ? WHERE shiftId = ?";
 
-	private static final String BOOK_SHIFT_Q = "UPDATE Shift" + "SET availability = 0" + "WHERE shiftId = ?";
+	private static final String BOOK_SHIFT_Q = "UPDATE Shift SET availability = 0 WHERE shiftId = ?";
 	// jeg ved ikke helt hvordan jeg skal fikse det nu har bare skrevet den ind for nu
-	//private static final String CONFIRM_SHIFT_Q = "UPDATE Shift" + "WHERE shiftId = ? AND availability = 0";
+	//private static final String CONFIRM_SHIFT_Q = "UPDATE Shift WHERE shiftId = ? AND availability = 0";
 	public ShiftDB() throws DataAccessException {
 		try {
 			this.con = DBConnection.getInstance().getConnection();
