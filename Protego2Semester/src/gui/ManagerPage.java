@@ -9,6 +9,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.GridLayout;
 import javax.swing.JButton;
+import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ManagerPage extends JFrame {
 
@@ -44,6 +47,7 @@ public class ManagerPage extends JFrame {
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel panelShiftList = new JPanel();
+		panelShiftList.setBackground(new Color(70, 70, 70));
 		contentPane.add(panelShiftList);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -53,15 +57,28 @@ public class ManagerPage extends JFrame {
 		panelShiftList.add(tblShiftList);
 		
 		JPanel panelButtons = new JPanel();
+		panelButtons.setOpaque(false);
 		contentPane.add(panelButtons);
 		
 		JButton btnNewShift = new JButton("New Shift");
+		btnNewShift.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		panelButtons.add(btnNewShift);
 		
 		JButton btnUpdate = new JButton("Update");
+		btnUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		panelButtons.add(btnUpdate);
 		
 		JButton btnDelete = new JButton("Delete");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		panelButtons.add(btnDelete);
 
 	}
