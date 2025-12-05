@@ -8,7 +8,7 @@ import model.Employee;
 import model.Shift;
 
 public class EmployeeDB implements EmployeeDBIF {
-	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employee_id, shift_id) VALUES (?, ?)";
+	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (Id, shiftId) VALUES (?, ?)";
 
 	private PreparedStatement connectShiftToEmployeestmt;
 
@@ -46,13 +46,13 @@ public class EmployeeDB implements EmployeeDBIF {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}	
 	}
 
 	@SuppressWarnings("unused")
 	private Employee buildObject(ResultSet rs) throws SQLException {
-		Employee employee = new Employee(rs.getInt("employeeId"), rs.getString("firstName"), rs.getString("lastName"),
-				rs.getString("adress"), rs.getString("city"), rs.getInt("postalNr"), rs.getInt("phone"),
+		Employee employee = new Employee(rs.getInt("Id"), rs.getString("firstName"), rs.getString("lastName"),
+				rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getInt("phone"),
 				rs.getString("email"));
 
 		return employee;
