@@ -18,6 +18,7 @@ public class ManagerPage extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTable tblShiftList;
+	private ShiftTableModel shiftTableModel;
 
 	/**
 	 * Launch the application.
@@ -46,16 +47,20 @@ public class ManagerPage extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 		
+		// Panel for the table
 		JPanel panelShiftList = new JPanel();
 		panelShiftList.setBackground(new Color(70, 70, 70));
 		contentPane.add(panelShiftList);
 		
+		//creating model and tabel
+		shiftTableModel = new ShiftTableModel();
+		tblShiftList = new JTable(shiftTableModel);
+		
+		// Inserting the table into a scrollpane
 		JScrollPane scrollPane = new JScrollPane();
 		panelShiftList.add(scrollPane);
 		
-		tblShiftList = new JTable();
-		panelShiftList.add(tblShiftList);
-		
+		// Panel for buttons
 		JPanel panelButtons = new JPanel();
 		panelButtons.setOpaque(false);
 		contentPane.add(panelButtons);
@@ -82,5 +87,6 @@ public class ManagerPage extends JFrame {
 		panelButtons.add(btnDelete);
 
 	}
+	
 
 }
