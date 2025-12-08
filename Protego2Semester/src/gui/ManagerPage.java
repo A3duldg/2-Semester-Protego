@@ -3,14 +3,22 @@ package gui;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import controller.ShiftController;
+import database.DataAccessException;
+import model.Shift;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.GridLayout;
 import javax.swing.JButton;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 public class ManagerPage extends JFrame {
@@ -57,7 +65,7 @@ public class ManagerPage extends JFrame {
 		tblShiftList = new JTable(shiftTableModel);
 		
 		// Inserting the table into a scrollpane
-		JScrollPane scrollPane = new JScrollPane();
+		JScrollPane scrollPane = new JScrollPane(tblShiftList);
 		panelShiftList.add(scrollPane);
 		
 		// Panel for buttons
@@ -85,6 +93,20 @@ public class ManagerPage extends JFrame {
 			}
 		});
 		panelButtons.add(btnDelete);
+		
+		 try {
+	            ShiftController shiftController = new ShiftController();
+	            // true = only available shifts
+	            List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
+	            shiftTableModel.setData(availableShifts);
+	        } catch (DataAccessException dae) {
+	            dae.printStackTrace();
+	            JOptionPane.showMessageDialog(this,
+	                "Could not load available shifts.\n" + dae.getMessage(),
+	                "Database Error", JOptionPane.ERROR_MESSAGE);
+	            shiftTableModel.setData(new ArrayList<>());
+	        }
+
 
 	}
 	
