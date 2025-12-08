@@ -17,11 +17,11 @@ public class ShiftDB implements ShiftDBIF {
 	private PreparedStatement setShiftTypeStms;
 	private PreparedStatement bookShiftStms;
 
-	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, shiftType, availability FROM Shift WHERE availability = 1";
+	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, type, availability FROM Shift WHERE availability = ?";
 
-	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, shiftType, availability) VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability) VALUES (?, ?, ?, ?, ?, ?)";
 
-	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET shiftType = ? WHERE shiftId = ?";
+	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET type = ? WHERE shiftId = ?";
 
 	private static final String BOOK_SHIFT_Q = "UPDATE Shift SET availability = 0 WHERE shiftId = ?";
 
@@ -58,6 +58,7 @@ public class ShiftDB implements ShiftDBIF {
 						rs.getBoolean("availability"),
 						rs.getInt("shiftId")
 						);
+				shift.setShiftType(rs.getString("type")); // We need to set the type
 				list.add(shift);
 			}		
 		
@@ -71,7 +72,7 @@ public class ShiftDB implements ShiftDBIF {
 	public int createShift(Shift shift) {
 		int newId = -1;
 		
-		String sql = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, shiftType, availability)" + 
+		String sql = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability)" + 
 		"VALUES (?, ?, ?, ?, ?, ?)";
 		
 		try (PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -101,7 +102,8 @@ public class ShiftDB implements ShiftDBIF {
 	public boolean setShiftType(Shift shift) {
 		boolean result = false;
 		
-		String sql = "UPDATE Shift" + "SET shiftType = ?" + "WHERE shiftId = ?";
+		String sql = "UPDATE Shift SET type = ? WHERE shiftId = ?";
+
 		
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			stmt.setString(1, shift.getType());
@@ -122,7 +124,8 @@ public class ShiftDB implements ShiftDBIF {
 	public boolean bookShift(Shift shift) {
 		boolean result = false;
 		
-		String sql = "UPDATE Shift" + "SET availability = 0" + "WHERE shiftId = ?";
+		String sql = "UPDATE Shift SET availability = 0 WHERE shiftId = ?";
+
 		
 		try (PreparedStatement stmt = con.prepareStatement(sql)) {
 			stmt.setInt(1, shift.getShiftId());

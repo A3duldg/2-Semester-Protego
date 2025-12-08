@@ -32,83 +32,74 @@ public class ManagerPage extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ManagerPage frame = new ManagerPage();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	    EventQueue.invokeLater(() -> {
+	        try {
+	            ManagerPage frame = new ManagerPage(); // no checked exception anymore
+	            frame.setVisible(true);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            JOptionPane.showMessageDialog(null,
+	                "Could not start ManagerPage.\n" + e.getMessage(),
+	                "Error", JOptionPane.ERROR_MESSAGE);
+	        }
+	    });
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public ManagerPage() {
+		shiftTableModel = new ShiftTableModel();
+
+			ShiftController shiftController = new ShiftController();
+			List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
+			shiftTableModel.setData(availableShifts);
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new GradientPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
-		
+
 		// Panel for the table
 		JPanel panelShiftList = new JPanel();
 		panelShiftList.setBackground(new Color(70, 70, 70));
 		contentPane.add(panelShiftList);
+
+		// creating model and tabel
 		
-		//creating model and tabel
-		shiftTableModel = new ShiftTableModel();
 		tblShiftList = new JTable(shiftTableModel);
-		
+
 		// Inserting the table into a scrollpane
 		JScrollPane scrollPane = new JScrollPane(tblShiftList);
 		panelShiftList.add(scrollPane);
-		
+
 		// Panel for buttons
 		JPanel panelButtons = new JPanel();
 		panelButtons.setOpaque(false);
 		contentPane.add(panelButtons);
-		
+
 		JButton btnNewShift = new JButton("New Shift");
 		btnNewShift.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		panelButtons.add(btnNewShift);
-		
+
 		JButton btnUpdate = new JButton("Update");
 		btnUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		panelButtons.add(btnUpdate);
-		
+
 		JButton btnDelete = new JButton("Delete");
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
 		panelButtons.add(btnDelete);
-		
-		 try {
-	            ShiftController shiftController = new ShiftController();
-	            // true = only available shifts
-	            List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
-	            shiftTableModel.setData(availableShifts);
-	        } catch (DataAccessException dae) {
-	            dae.printStackTrace();
-	            JOptionPane.showMessageDialog(this,
-	                "Could not load available shifts.\n" + dae.getMessage(),
-	                "Database Error", JOptionPane.ERROR_MESSAGE);
-	            shiftTableModel.setData(new ArrayList<>());
-	        }
-
 
 	}
-	
-
 }
