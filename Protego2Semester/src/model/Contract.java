@@ -12,9 +12,8 @@ public class Contract {
 	private boolean confirmed;
 
 	public Contract(int contractId) {
-		if (contractId <= 0) {
-			throw new IllegalArgumentException("Contract ID must be bigger than 0");
-		}
+		
+	
 		this.contractId = contractId;
 		this.active = true;
 		this.confirmed = true;
@@ -92,7 +91,7 @@ public class Contract {
 		this.endDate = endDate;
 	}
 
-	public void setStartDate(LocalDate localDate, LocalDate startDate) {
+	public void setStartDate(LocalDate startDate, LocalDate endDate) {
 		if (startDate == null) {
 			throw new IllegalArgumentException("Start date cannot be null");
 		}
