@@ -8,11 +8,11 @@ public class Manager {
 	private String address;
 	private String city;
 	private int postalNr;
-	private int phone;
+	private String phone;
 	private String email;
 
 	public Manager(int managerId, String firstName, String lastName, String address, String city, int postalNr,
-			int phone, String email) {
+			String phone, String email) {
 		this.managerId = managerId;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -47,7 +47,7 @@ public class Manager {
 		return postalNr;
 	}
 
-	public int getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 

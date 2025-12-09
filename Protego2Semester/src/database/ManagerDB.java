@@ -34,7 +34,7 @@ public class ManagerDB implements ManagerDBIF {
 
 			if (rs.next()) {
 				manager = new Manager(rs.getInt("managerId"), rs.getString("firstName"), rs.getString("lastName"),
-						rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getInt("phone"),
+						rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
 						rs.getString("email"));
 			}
 		} catch (Exception e) {
