@@ -97,13 +97,10 @@ public class ShiftController {
 	    }
 
 
-	public List<Shift> findShiftByAvailability(boolean availability) {
-	    try {
+	public List<Shift> findShiftByAvailability(boolean availability) throws DataAccessException {
 	        return shiftDB.findShiftByAvailability(availability);
-	    } catch (DataAccessException e) {
-	        e.printStackTrace();
-	        return new ArrayList<>(); // fallback
-	    }
+	   
+	 
 	}
 
 

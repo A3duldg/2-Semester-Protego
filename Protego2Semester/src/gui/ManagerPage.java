@@ -60,9 +60,18 @@ public class ManagerPage extends JFrame {
 		this.managerId = managerId;
 		shiftTableModel = new ShiftTableModel();
 
+		try {
+
 		ShiftController shiftController = new ShiftController();
 		List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
 		shiftTableModel.setData(availableShifts);
+		} catch (DataAccessException e) {
+		    JOptionPane.showMessageDialog(this,
+		        "Error loading shifts: " + e.getMessage(),
+		        "Database Error",
+		        JOptionPane.ERROR_MESSAGE);
+		}
+
 		setTitle("Manager Dashboard - ID: " + managerId);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -136,7 +145,12 @@ public class ManagerPage extends JFrame {
 					shiftTableModel.setData(updatedList);
 				} catch (NumberFormatException ex) {
 					JOptionPane.showMessageDialog(this, "Please enter valid numbers for start, end, and guards.");
-				}
+				} catch (DataAccessException ex) {
+			        JOptionPane.showMessageDialog(this,
+			            "Database error while creating shift: " + ex.getMessage());
+			    }
+
+				
 
 			}
 		});
