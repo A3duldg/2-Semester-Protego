@@ -15,9 +15,9 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	private Connection con;
 
-	public EmployeeDB() throws DataAccessException{
-		 db = DBConnection.getInstance();
-		
+	public EmployeeDB() throws DataAccessException {
+		db = DBConnection.getInstance();
+
 		try {
 			this.con = DBConnection.getInstance().getConnection();
 
@@ -29,6 +29,7 @@ public class EmployeeDB implements EmployeeDBIF {
 	}
 
 	@Override
+	// transaction
 	public void connectShiftToEmployee(Employee employee, Shift shift) {
 		if (con == null) {
 			System.out.println("No database connection available");
@@ -36,10 +37,14 @@ public class EmployeeDB implements EmployeeDBIF {
 		}
 
 		try {
+
+			con.setAutoCommit(false);
+
 			connectShiftToEmployeestmt.setInt(1, employee.getEmployeeId());
 			connectShiftToEmployeestmt.setInt(2, shift.getShiftId());
 			int rowsAffected = connectShiftToEmployeestmt.executeUpdate();
 
+			con.commit();
 			if (rowsAffected > 0) {
 				System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
 						+ shift.getShiftId());
@@ -48,49 +53,56 @@ public class EmployeeDB implements EmployeeDBIF {
 			}
 
 		} catch (SQLException e) {
+			try {
+				if (con != null) {
+					con.rollback();
+					System.out.println("Transaction rolled back due to error");
+				}
+			} catch (SQLException rollbackEx) {
+				System.out.println("Warning: Could not rollback transaction: " + rollbackEx.getMessage());
+			}
 			e.printStackTrace();
-		}	
+		} finally {
+			try {
+				if (con != null) {
+					con.setAutoCommit(true);
+				}
+			} catch (SQLException e) {
+				System.out.println("Warning: Could not reset auto-commit: " + e.getMessage());
+			}
+		}
 	}
 
 	@SuppressWarnings("unused")
 	private Employee buildObject(ResultSet rs) throws SQLException {
 		Employee employee = new Employee(rs.getInt("Id"), rs.getString("firstName"), rs.getString("lastName"),
-				rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getInt("phone"),
+				rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
 				rs.getString("email"));
 
 		return employee;
 	}
-	
+
 	@Override
-    public Employee getEmployeeId(int employeeId) {
-        Employee employee = null;
-        String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.Id = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.Id = ?";
+	public Employee getEmployeeId(int employeeId) {
+		Employee employee = null;
+		String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.Id = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.Id = ?";
 
-        try (Connection conn = db.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, employeeId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    employee = new Employee(
-                        rs.getInt("Id"),
-                        rs.getString("firstName"),
-                        rs.getString("lastName"),
-                        rs.getString("address"),
-                        rs.getString("city"),
-                        rs.getInt("postalNr"),
-                        rs.getInt("phone"),   // ⚠️ use getString if phone is VARCHAR
-                        rs.getString("email")
-                    );
-                }
-            }
-        } catch (DataAccessException dae) {
-            dae.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return employee;
-    }
-
+			stmt.setInt(1, employeeId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					employee = new Employee(rs.getInt("Id"), rs.getString("firstName"), rs.getString("lastName"),
+							rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
+							rs.getString("email"));
+				}
+			}
+		} catch (DataAccessException dae) {
+			dae.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employee;
+	}
 
 }

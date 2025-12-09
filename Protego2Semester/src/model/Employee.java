@@ -9,11 +9,11 @@ public class Employee {
 	private String adress;
 	private String city;
 	private int postalNr;
-	private int phone;
+	private String phone;
 	private String email;
 	private ArrayList<Shift> shifts = new ArrayList<>();
 
-	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,int phone, String email) {
+	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,String phone, String email) {
 		this.employeeId = employeeId;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -66,11 +66,11 @@ public String getFirstName() {
 		this.postalNr = postalNr;
 	}
 
-	public int getPhone() {
+	public String getPhone() {
 		return phone;
 	}
 
-	public void setPhone(int phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
 
