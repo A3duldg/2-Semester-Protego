@@ -61,14 +61,13 @@ public class EmployeePage extends JFrame {
 		shiftTableModel = new ShiftTableModel();
 
 		try {
-		ShiftController shiftController = new ShiftController();
-		List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
-		shiftTableModel.setData(availableShifts);
+			ShiftController shiftController = new ShiftController();
+			List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
+			shiftTableModel.setData(availableShifts);
 		} catch (DataAccessException e) {
-		    JOptionPane.showMessageDialog(this, "Error loading shifts: " + e.getMessage());
+			JOptionPane.showMessageDialog(this, "Error loading shifts: " + e.getMessage());
 		}
 
-		
 		setTitle("Employee Dashboard - ID: " + employeeId);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -95,39 +94,38 @@ public class EmployeePage extends JFrame {
 		JPanel panelButtons = new JPanel();
 		panelButtons.setOpaque(false);
 		contentPane.add(panelButtons);
-		
-		
-
 
 		JButton btnBook = new JButton("Book");
 		btnBook.addActionListener(e -> {
-		    int selectedRow = tblShiftList.getSelectedRow();
-		    if (selectedRow >= 0) {
-		        int shiftId = (int) tblShiftList.getValueAt(selectedRow, 0); // assuming column 0 is shiftId
-		        try {
-		            // Fetch the selected shift from your table model
-		            Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
+			int selectedRow = tblShiftList.getSelectedRow();
+			if (selectedRow >= 0) {
+				int shiftId = (int) tblShiftList.getValueAt(selectedRow, 0); // assuming column 0 is shiftId
+				try {
+					// Fetch the selected shift from your table model
+					Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
 
-		            // Create EmployeeController (you may want to inject it instead of new)
-		            EmployeeController employeeController = new EmployeeController(new EmployeeDB());
+					// Create EmployeeController (you may want to inject it instead of new)
+					EmployeeController employeeController = new EmployeeController(new EmployeeDB());
 
-		            // Look up the logged-in employee (you already have employeeId)
-		           
-		            Employee loggedInEmployee = employeeController.getEmployeeId(employeeId); // assuming you have a findById method
+					// Look up the logged-in employee (you already have employeeId)
 
-		            // Connect employee to shift
-		            employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
+					Employee loggedInEmployee = employeeController.getEmployeeId(employeeId); // assuming you have a
+																								// findById method
 
-		            JOptionPane.showMessageDialog(this, "Shift booked successfully!");
-		            refreshShiftTable();
-		        } catch (DataAccessException ex) {
-		            JOptionPane.showMessageDialog(this, "Error booking shift: " + ex.getMessage());
-		        }
-		    } else {
-		        JOptionPane.showMessageDialog(this, "Please select a shift to book.");
-		    }
+					// Connect employee to shift
+					employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
+
+					JOptionPane.showMessageDialog(this, "Shift booked successfully!");
+					refreshShiftTable();
+				} catch (IllegalStateException ex) {
+					JOptionPane.showMessageDialog(this, "Error booking shift: " + ex.getMessage());
+				} catch (DataAccessException ex) {
+					JOptionPane.showMessageDialog(this, "Database connection error: " + ex.getMessage());
+				}
+				} else {
+				JOptionPane.showMessageDialog(this, "Please select a shift to book.");
+			}
 		});
-
 
 		panelButtons.add(btnBook);
 
@@ -139,14 +137,15 @@ public class EmployeePage extends JFrame {
 		panelButtons.add(btnInfo);
 
 	}
+
 	private void refreshShiftTable() {
-	    try {
-	        ShiftController shiftController = new ShiftController();
-	        List<Shift> updatedShifts = shiftController.findShiftByAvailability(true);
-	        shiftTableModel.setData(updatedShifts);
-	        shiftTableModel.fireTableDataChanged();
-	    } catch (DataAccessException e) {
-	        JOptionPane.showMessageDialog(this, "Error refreshing shift table: " + e.getMessage());
-	    }
+		try {
+			ShiftController shiftController = new ShiftController();
+			List<Shift> updatedShifts = shiftController.findShiftByAvailability(true);
+			shiftTableModel.setData(updatedShifts);
+			shiftTableModel.fireTableDataChanged();
+		} catch (DataAccessException e) {
+			JOptionPane.showMessageDialog(this, "Error refreshing shift table: " + e.getMessage());
+		}
 	}
 }

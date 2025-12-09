@@ -30,32 +30,38 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	@Override
 	// transaction
-	public void connectShiftToEmployee(Employee employee, Shift shift) {
-		if (con == null) {
-			System.out.println("No database connection available");
-			return;
-		}
+	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
+		String sql = "INSERT INTO EmployeeShift (Id, shiftId) VALUES (?, ?)";
+		String checkSql = "SELECT COUNT(*) FROM EmployeeShift WHERE Id = ? AND shiftId = ?";
 
-		try {
+		try (Connection con = DBConnection.getInstance().getConnection();
+				PreparedStatement checkStmt = con.prepareStatement(checkSql)) {
 
+			checkStmt.setInt(1, employee.getEmployeeId());
+			checkStmt.setInt(2, shift.getShiftId());
+			try (ResultSet rs = checkStmt.executeQuery()) {
+				if (rs.next() && rs.getInt(1) > 0) {
+					throw new IllegalStateException(" You are already assigned to this shift");
+				}
+			}
 
+			try (PreparedStatement insertStmt = con.prepareStatement(sql)) {
 
-			connectShiftToEmployeestmt.setInt(1, employee.getEmployeeId());
-			connectShiftToEmployeestmt.setInt(2, shift.getShiftId());
-			int rowsAffected = connectShiftToEmployeestmt.executeUpdate();
+				insertStmt.setInt(1, employee.getEmployeeId());
+				insertStmt.setInt(2, shift.getShiftId());
+				int rowsAffected = insertStmt.executeUpdate();
 
-			
-			if (rowsAffected > 0) {
-				System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
-						+ shift.getShiftId());
-			} else {
-				System.out.println("Failed to assign shift to employee.");
+				if (rowsAffected > 0) {
+					System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId()
+							+ ", shiftId=" + shift.getShiftId());
+				} else {
+					System.out.println("Failed to assign shift to employee.");
+				}
 			}
 
 		} catch (SQLException e) {
-			
-			e.printStackTrace();
-		}	
+			throw new DataAccessException("Error connecting shift to employee", e);
+		}
 	}
 
 	@SuppressWarnings("unused")
