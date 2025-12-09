@@ -45,9 +45,9 @@ public class DBConnection {
 	}
 
 	
-	
+	/* Original way
 	public Connection getConnection() throws DataAccessException {
-        if (connection == null) {
+        if (connection == null ) {
             try {
 				this.connection = createNewConnection();
 			} catch (SQLException e) {
@@ -57,6 +57,21 @@ public class DBConnection {
         }
         return connection;
 	}
+	*/
+	
+	public Connection getConnection() throws DataAccessException {
+	    try {
+	        if (connection == null || connection.isClosed()) {
+	            this.connection = createNewConnection();
+	        }
+	        return connection;
+	    } catch (SQLException e) {
+	        throw new DataAccessException(
+	            String.format("Could not connect to database %s@%s:%d user %s",
+	                DBNAME, SERVERNAME, PORTNUMBER, USERNAME), e );
+	    }
+	}
+
 
 
 	public void disconnect() throws DataAccessException {

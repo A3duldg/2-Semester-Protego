@@ -13,7 +13,7 @@ public class EmployeeController {
 		this.employeeDB = employeeDB;
 	}
 
-	public void ConnectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
+	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
 		if (employee == null || shift == null) {
 			System.out.println("Employee or Shift cannot be null");
 			return;

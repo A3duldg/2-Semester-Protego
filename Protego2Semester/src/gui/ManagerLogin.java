@@ -150,7 +150,19 @@ public class ManagerLogin extends JFrame {
 
 			try {
 				LoginValidator validator = new LoginValidator();
-				JOptionPane.showMessageDialog(panel_ID, "Login success!");
+				LoginValidator.Role role = validator.validate(id);
+
+				if (role == LoginValidator.Role.MANAGER) {
+					int managerId = Integer.parseInt(id);
+					ManagerPage managerPage = new ManagerPage(managerId);
+					managerPage.setVisible(true);
+
+					dispose();
+				} else {
+					JOptionPane.showMessageDialog(ManagerLogin.this, "Invalid credentials");
+
+				}
+				// JOptionPane.showMessageDialog(panel_ID, "Login success!");
 			} catch (DataAccessException dae) {
 				JOptionPane.showMessageDialog(ManagerLogin.this, "Access denied.");
 			}

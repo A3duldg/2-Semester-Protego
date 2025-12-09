@@ -24,7 +24,15 @@ public class ManagerDB implements ManagerDBIF {
 		try {
 			conn = db.getConnection();
 
-			String sql = "SELECT managerId, firstName, lastName, address, city, postalNr, phone, email FROM Manager WHERE managerId = ?";
+			String sql = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, " +
+	                 "a.address, a.city, a.postalNr " +
+	                 "FROM Manager m " +
+	                 "JOIN Person p ON m.managerId = p.id " +   // ✅ fixed here
+	                 "JOIN AddressCityPostal a ON p.addressId = a.addressId " +
+	                 "WHERE m.managerId = ?";
+
+
+
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, managerId);
 			rs = stmt.executeQuery();
