@@ -22,6 +22,7 @@ public class Contract {
 
 	public Contract(int contractId, int employeeId, LocalDate startDate, LocalDate endDate, boolean active,
 			boolean confirmed) {
+		//Validation
 		if (contractId <= 0) {
 			throw new IllegalArgumentException("Contract ID must be positive");
 		}
@@ -142,5 +143,11 @@ public class Contract {
 	    @Override
 	    public int hashCode() {
 	        return Objects.hash(contractId);
+	    }
+	    
+	    @Override
+	    public String toString() {
+	        return String.format("Contract[id=%d, employeeId=%d, start=%s, end=%s, active=%b, confirmed=%b]",
+	            contractId, employeeId, startDate, endDate, active, confirmed);
 	    }
 }
