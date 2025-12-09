@@ -11,17 +11,19 @@ public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
 	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (Id, shiftId) VALUES (?, ?)";
 
-	private PreparedStatement connectShiftToEmployeestmt;
+	// gamle kode jeg fjerner.
+//	private PreparedStatement connectShiftToEmployeestmt;
 
-	private Connection con;
+	// private Connection con;
 
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
 
 		try {
-			this.con = DBConnection.getInstance().getConnection();
+			// this.con = DBConnection.getInstance().getConnection();
 
-			connectShiftToEmployeestmt = con.prepareStatement(CONNECT_SHIFT_TO_EMPLOYEE_Q);
+			// connectShiftToEmployeestmt =
+			// con.prepareStatement(CONNECT_SHIFT_TO_EMPLOYEE_Q);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not intialize EmployeeDB", e);
@@ -29,38 +31,83 @@ public class EmployeeDB implements EmployeeDBIF {
 	}
 
 	@Override
-	// transaction
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
-		String sql = "INSERT INTO EmployeeShift (Id, shiftId) VALUES (?, ?)";
-		String checkSql = "SELECT COUNT(*) FROM EmployeeShift WHERE Id = ? AND shiftId = ?";
+		DBConnection db = DBConnection.getInstance();
+		Connection con = null;
+		PreparedStatement checkEmployeeStmt = null;
+		PreparedStatement checkShiftStmt = null;
+		PreparedStatement checkExistingStmt = null;
+		PreparedStatement insertStmt = null;
 
-		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement checkStmt = con.prepareStatement(checkSql)) {
+		try {
+			// Start transaktion via DBConnection
+			db.startTransaction();
+			con = db.getConnection();
 
-			checkStmt.setInt(1, employee.getEmployeeId());
-			checkStmt.setInt(2, shift.getShiftId());
-			try (ResultSet rs = checkStmt.executeQuery()) {
-				if (rs.next() && rs.getInt(1) > 0) {
-					throw new IllegalStateException(" You are already assigned to this shift");
-				}
+			// Check om employee findes
+			String employeeSql = "SELECT COUNT(*) FROM Employee WHERE Id = ?";
+			checkEmployeeStmt = con.prepareStatement(employeeSql);
+			checkEmployeeStmt.setInt(1, employee.getEmployeeId());
+			ResultSet rsEmp = checkEmployeeStmt.executeQuery();
+			if (rsEmp.next() && rsEmp.getInt(1) == 0) {
+				throw new IllegalStateException("Employee does not exist");
 			}
 
-			try (PreparedStatement insertStmt = con.prepareStatement(sql)) {
-
-				insertStmt.setInt(1, employee.getEmployeeId());
-				insertStmt.setInt(2, shift.getShiftId());
-				int rowsAffected = insertStmt.executeUpdate();
-
-				if (rowsAffected > 0) {
-					System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId()
-							+ ", shiftId=" + shift.getShiftId());
-				} else {
-					System.out.println("Failed to assign shift to employee.");
-				}
+			// Check om shift findes
+			String shiftSql = "SELECT COUNT(*) FROM Shift WHERE shiftId = ?";
+			checkShiftStmt = con.prepareStatement(shiftSql);
+			checkShiftStmt.setInt(1, shift.getShiftId());
+			ResultSet rsShift = checkShiftStmt.executeQuery();
+			if (rsShift.next() && rsShift.getInt(1) == 0) {
+				throw new IllegalStateException("Shift does not exist");
 			}
 
-		} catch (SQLException e) {
+			// Check om employee allerede er på shift
+			String checkExistingSql = "SELECT COUNT(*) FROM EmployeeShift WHERE Id = ? AND shiftId = ?";
+			checkExistingStmt = con.prepareStatement(checkExistingSql);
+			checkExistingStmt.setInt(1, employee.getEmployeeId());
+			checkExistingStmt.setInt(2, shift.getShiftId());
+			ResultSet rsExisting = checkExistingStmt.executeQuery();
+			if (rsExisting.next() && rsExisting.getInt(1) > 0) {
+				throw new IllegalStateException("Employee is already assigned to this shift");
+			}
+
+			// Insert i EmployeeShift
+			insertStmt = con.prepareStatement(CONNECT_SHIFT_TO_EMPLOYEE_Q);
+			insertStmt.setInt(1, employee.getEmployeeId());
+			insertStmt.setInt(2, shift.getShiftId());
+			int rows = insertStmt.executeUpdate();
+
+			if (rows == 0) {
+				throw new SQLException("Insert failed: no rows affected");
+			}
+
+			// Commit transaktion
+			db.commitTransaction();
+
+			System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
+					+ shift.getShiftId());
+
+		} catch (Exception e) {
+			// Rollback ved fejl
+			db.rollbackTransaction();
 			throw new DataAccessException("Error connecting shift to employee", e);
+
+		} finally {
+			// Oprydning af ressourcer
+			try {
+				if (checkEmployeeStmt != null)
+					checkEmployeeStmt.close();
+				if (checkShiftStmt != null)
+					checkShiftStmt.close();
+				if (checkExistingStmt != null)
+					checkExistingStmt.close();
+				if (insertStmt != null)
+					insertStmt.close();
+				// Connection håndteres af DBConnection vi lukker ikke her
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
