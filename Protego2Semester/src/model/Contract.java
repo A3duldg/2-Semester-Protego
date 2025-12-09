@@ -1,34 +1,146 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Contract {
 	private int contractId;
+	private int employeeId;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private boolean active;
+	private boolean confirmed;
 
 	public Contract(int contractId) {
+		if (contractId <= 0) {
+			throw new IllegalArgumentException("Contract ID must be bigger than 0");
+		}
 		this.contractId = contractId;
+		this.active = true;
+		this.confirmed = true;
+	}
+
+	public Contract(int contractId, int employeeId, LocalDate startDate, LocalDate endDate, boolean active,
+			boolean confirmed) {
+		if (contractId <= 0) {
+			throw new IllegalArgumentException("Contract ID must be positive");
+		}
+		if (employeeId <= 0) {
+			throw new IllegalArgumentException("Employee ID must be positive");
+		}
+		if (startDate == null) {
+			throw new IllegalArgumentException("Start date cannot be null");
+		}
+		if (endDate == null) {
+			throw new IllegalArgumentException("End date cannot be null");
+		}
+		if (endDate.isBefore(startDate)) {
+			throw new IllegalArgumentException("End date must be after start date");
+		}
+
+		this.contractId = contractId;
+		this.employeeId = employeeId;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.active = active;
+		this.confirmed = confirmed;
+	}
+
+	public int getContactId() {
+		return contractId;
 	}
 
 	public int getContract() {
 		return contractId;
 	}
 
+	public int getEmployeeId() {
+		return employeeId;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public boolean isConfirmed() {
+		return confirmed;
+	}
+	
+	public void setEmployeeId(int employeeId) {
+        if (employeeId <= 0) {
+            throw new IllegalArgumentException("Employee ID must be bigger than 0");
+        }
+        this.employeeId = employeeId;
+    }
+
+	public void setEndDate(LocalDate endDate) {
+		if (endDate == null) {
+			throw new IllegalArgumentException("End date cannot be null");
+		}
+		if (startDate != null && endDate.isBefore(startDate)) {
+			throw new IllegalArgumentException("End date must be after start date");
+		}
+		this.endDate = endDate;
+	}
+
+	public void setStartDate(LocalDate localDate, LocalDate startDate) {
+		if (startDate == null) {
+			throw new IllegalArgumentException("Start date cannot be null");
+		}
+		if (endDate != null && startDate.isAfter(endDate)) {
+			throw new IllegalArgumentException("Start date must be before end date");
+		}
+		this.startDate = startDate;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public void setConfirmed(boolean confirmed) {
+		this.confirmed = confirmed;
+	}
+	
 	public Contract confirmContract() {
+		this.confirmed = true;
 		return this;
 	}
-
-	public void setEndDate(LocalDate localDate) {
-		// TODO Auto-generated method stub
-
+	//Deaktiver contract
+	public void deactivate() {
+		this.active = false;
 	}
-
-	public void setStartDate(LocalDate localDate) {
-		// TODO Auto-generated method stub
-
+	//Tjekker om contract er gyldig på en bestemt dato
+	public boolean isValidOn(LocalDate date) {
+		if (date == null || !active) {
+            return false;
+        }
+        return !date.isBefore(startDate) && !date.isAfter(endDate);
 	}
-
-	public void setEmployeeId(int int1) {
-		// TODO Auto-generated method stub
-
-	}
+	//Tjekker om Contact er udløbet
+	 public boolean isExpired() {
+	        if (endDate == null) {
+	            return false;
+	        }
+	        return LocalDate.now().isAfter(endDate);
+	    }
+	 @Override
+	    public boolean equals(Object obj) {
+	        if (this == obj) return true;
+	        if (obj == null || getClass() != obj.getClass()) return false;
+	        Contract contract = (Contract) obj;
+	        return contractId == contract.contractId;
+	    }
+	    
+	    @Override
+	    public int hashCode() {
+	        return Objects.hash(contractId);
+	    }
 }
