@@ -11,7 +11,12 @@ public class ManagerDB implements ManagerDBIF {
 
 	public ManagerDB() throws DataAccessException {
 		db = DBConnection.getInstance();
+	}
 
+	private Manager mapManager(ResultSet rs) throws SQLException {
+		return new Manager(rs.getInt("managerId"), rs.getString("firstName"), rs.getString("lastName"),
+				rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
+				rs.getString("email"));
 	}
 
 	@Override
@@ -24,23 +29,24 @@ public class ManagerDB implements ManagerDBIF {
 		try {
 			conn = db.getConnection();
 
-			String sql = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Manager m JOIN Person p ON m.managerId = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE m.managerId = ?";
-
-
+			
+			String sql = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, "
+					+ "a.address, a.city, a.postalNr " + "FROM Manager m " + "JOIN Person p ON m.managerId = p.id "
+					+ "JOIN AddressCityPostal a ON p.addressId = a.addressId " + "WHERE m.managerId = ?";
 
 			stmt = conn.prepareStatement(sql);
 			stmt.setInt(1, managerId);
 			rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				manager = new Manager(rs.getInt("managerId"), rs.getString("firstName"), rs.getString("lastName"),
-						rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
-						rs.getString("email"));
+
+				manager = mapManager(rs);
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			// Close resources and return connection to pool
+
 			try {
 				if (rs != null)
 					rs.close();
@@ -58,7 +64,7 @@ public class ManagerDB implements ManagerDBIF {
 
 	@Override
 	public Manager findActiveManager(int managerId) {
-		// Example: if you want to check an "active" flag, extend SQL above.
+
 		return findManagerId(managerId);
 	}
 }
