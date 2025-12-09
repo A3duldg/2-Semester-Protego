@@ -31,7 +31,7 @@ public class Manager {
 		return firstName;
 	}
 
-	public String getLatName() {
+	public String getLastName() {
 		return lastName;
 	}
 
@@ -53,5 +53,9 @@ public class Manager {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public String getFullName() {
+		return firstName + "" + lastName;
 	}
 }
