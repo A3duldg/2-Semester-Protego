@@ -45,19 +45,7 @@ public class DBConnection {
 	}
 
 	
-	/* Original way
-	public Connection getConnection() throws DataAccessException {
-        if (connection == null ) {
-            try {
-				this.connection = createNewConnection();
-			} catch (SQLException e) {
-				throw new DataAccessException(String.format("Could not connect to database %s@%s:%d user %s", DBNAME,
-						SERVERNAME, PORTNUMBER, USERNAME), e);
-			}
-        }
-        return connection;
-	}
-	*/
+	
 	
 	public Connection getConnection() throws DataAccessException {
 	    try {
@@ -93,7 +81,7 @@ public class DBConnection {
 		try {
 			connection.setAutoCommit(false);
 		} catch (SQLException e) {
-			// e.printStackTrace();
+			
 			throw new DataAccessException("Could not start transaction.", e);
 		}
 	}
@@ -104,7 +92,7 @@ public class DBConnection {
 				connection.commit();
 			} catch (SQLException e) {
 				throw e;
-				// e.printStackTrace();
+				
 			} finally {
 				connection.setAutoCommit(true);
 			}
@@ -119,7 +107,7 @@ public class DBConnection {
 				connection.rollback();
 			} catch (SQLException e) {
 				throw e;
-				// e.printStackTrace();
+				
 			} finally {
 				connection.setAutoCommit(true);
 			}

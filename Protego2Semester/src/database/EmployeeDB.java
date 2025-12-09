@@ -64,12 +64,7 @@ public class EmployeeDB implements EmployeeDBIF {
 	@Override
     public Employee getEmployeeId(int employeeId) {
         Employee employee = null;
-        String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, " +
-                     "a.address, a.city, a.postalNr " +
-                     "FROM Employee e " +
-                     "JOIN Person p ON e.Id = p.id " +
-                     "JOIN AddressCityPostal a ON p.addressId = a.addressId " +
-                     "WHERE e.Id = ?";
+        String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.Id = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.Id = ?";
 
         try (Connection conn = db.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
