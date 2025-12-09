@@ -38,13 +38,13 @@ public class EmployeeDB implements EmployeeDBIF {
 
 		try {
 
-			con.setAutoCommit(false);
+
 
 			connectShiftToEmployeestmt.setInt(1, employee.getEmployeeId());
 			connectShiftToEmployeestmt.setInt(2, shift.getShiftId());
 			int rowsAffected = connectShiftToEmployeestmt.executeUpdate();
 
-			con.commit();
+			
 			if (rowsAffected > 0) {
 				System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
 						+ shift.getShiftId());
@@ -53,24 +53,9 @@ public class EmployeeDB implements EmployeeDBIF {
 			}
 
 		} catch (SQLException e) {
-			try {
-				if (con != null) {
-					con.rollback();
-					System.out.println("Transaction rolled back due to error");
-				}
-			} catch (SQLException rollbackEx) {
-				System.out.println("Warning: Could not rollback transaction: " + rollbackEx.getMessage());
-			}
+			
 			e.printStackTrace();
-		} finally {
-			try {
-				if (con != null) {
-					con.setAutoCommit(true);
-				}
-			} catch (SQLException e) {
-				System.out.println("Warning: Could not reset auto-commit: " + e.getMessage());
-			}
-		}
+		}	
 	}
 
 	@SuppressWarnings("unused")
