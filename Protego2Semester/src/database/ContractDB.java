@@ -73,6 +73,22 @@ public class ContractDB implements ContractDBIF {
 	    return contract;
 	}
 	
+	public int countBookedGuardsForContract(int contractId) throws DataAccessException {
+	    String sql = "SELECT COUNT(*) FROM EmployeeShift es JOIN Shift s ON es.shiftId = s.shiftId WHERE s.contractId = ?";
+	    try (Connection con = DBConnection.getInstance().getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	        stmt.setInt(1, contractId);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(1);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        throw new DataAccessException("Error counting booked guards for contract", e);
+	    }
+	    return 0;
+	}
+	
 	// Added this method
 	@Override
 	public Contract findActiveContract(int employeeId) throws DataAccessException {

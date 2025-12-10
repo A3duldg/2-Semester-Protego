@@ -8,10 +8,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import controller.ContractController;
 import controller.EmployeeController;
 import controller.ShiftController;
 import database.DataAccessException;
 import database.EmployeeDB;
+import model.Contract;
 import model.Employee;
 import model.Shift;
 
@@ -106,17 +108,29 @@ public class EmployeePage extends JFrame {
 
 					// Create EmployeeController (you may want to inject it instead of new)
 					EmployeeController employeeController = new EmployeeController(new EmployeeDB());
+					ContractController contractController = new ContractController();
+
 
 					// Look up the logged-in employee (you already have employeeId)
 
 					Employee loggedInEmployee = employeeController.getEmployeeId(employeeId); // assuming you have a
 																								// findById method
 
+					//Find contract assigned to shift
+					Contract contract = contractController.findContractById(selectedShift.getContract());
+					
+					// Count number of guards on a booking
+					int booked = contractController.countBookedGuardsForContract(contract.getContract());
+					
+					if(booked < contract.getGuardAmount()) {
 					// Connect employee to shift
 					employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
 
 					JOptionPane.showMessageDialog(this, "Shift booked successfully!");
 					refreshShiftTable();
+					} else {
+						JOptionPane.showMessageDialog(this, "This contract is fully staffed. No more bookings allowed.");
+					}
 				} catch (IllegalStateException ex) {
 					JOptionPane.showMessageDialog(this, "Error booking shift: " + ex.getMessage());
 				} catch (DataAccessException ex) {

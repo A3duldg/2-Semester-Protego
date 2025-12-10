@@ -11,6 +11,7 @@ public class Shift extends AbstractSubject {
 	private String type;
 	private boolean availability;
 	private int shiftId;
+	private int contractId;
 
 	private ArrayList<String> certifications;
 
@@ -61,9 +62,18 @@ public class Shift extends AbstractSubject {
 		return certifications;
 
 	}
+	
+	public void setContractId(int contractId) {
+	    this.contractId = contractId;
+	}
+
 
 	public int getStartTime() {
 		return startTime;
+	}
+	
+	public int getContract() {
+		return contractId;
 	}
 
 	public void setStartTime(int startTime) {

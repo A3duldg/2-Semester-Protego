@@ -69,6 +69,7 @@ public class ShiftDB implements ShiftDBIF {
 			stmt.setString(4, shift.getShiftLocation());
 			stmt.setString(5, shift.getType());
 			stmt.setBoolean(6, shift.isAvailable());
+			stmt.setInt(7, shift.getContract());
 
 			int rows = stmt.executeUpdate();
 
@@ -123,6 +124,22 @@ public class ShiftDB implements ShiftDBIF {
 
 		}
 		return result;
+	}
+	
+	public int countEmployeesForShift(int shiftId) throws DataAccessException {
+	    String sql = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
+	    try (Connection con = DBConnection.getInstance().getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	        stmt.setInt(1, shiftId);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getInt(1);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        throw new DataAccessException("Error counting employees for shift", e);
+	    }
+	    return 0;
 	}
 
 }
