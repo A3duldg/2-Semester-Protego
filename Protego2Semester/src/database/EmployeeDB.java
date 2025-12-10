@@ -18,7 +18,7 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
-
+		
 		try {
 			// this.con = DBConnection.getInstance().getConnection();
 
@@ -32,7 +32,6 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
-		DBConnection db = DBConnection.getInstance();
 		Connection con = null;
 		PreparedStatement checkEmployeeStmt = null;
 		PreparedStatement checkShiftStmt = null;
