@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.concurrent.*;
 
 public class DBConnection {
-    private static DBConnection connection;
+    private static DBConnection instance;
     private final BlockingQueue<Connection> connectionPool;
     private static final int POOL_SIZE = 10;
     
@@ -41,10 +41,10 @@ public class DBConnection {
     }
     
     public static synchronized DBConnection getInstance() throws DataAccessException {
-        if (connection == null) {
-            connection = new DBConnection();
+        if (instance == null) {
+            instance = new DBConnection();
         }
-        return connection;
+        return instance;
     }
     
     public Connection getConnection() throws DataAccessException {
@@ -114,7 +114,7 @@ public class DBConnection {
 
 	public int executeInsertWithIdentity(String sql) throws DataAccessException {
 		int res = -1;
-		try (Statement s = ((Connection) connection).createStatement()) {
+		try (Statement s = ((Connection) instance).createStatement()) {
 			res = s.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 			if (res > 0) {
 				ResultSet rs = s.getGeneratedKeys();
