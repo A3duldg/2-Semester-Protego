@@ -91,7 +91,7 @@ public class Contract {
 		this.endDate = endDate;
 	}
 
-	public void setStartDate(LocalDate startDate, LocalDate endDate) {
+	public void setStartDate(LocalDate startDate) {
 		if (startDate == null) {
 			throw new IllegalArgumentException("Start date cannot be null");
 		}
