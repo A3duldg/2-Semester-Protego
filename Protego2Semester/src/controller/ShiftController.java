@@ -86,13 +86,17 @@ public class ShiftController {
 	        }
 	    }
 
-
+	 // observer har ændre småt nogle ting, for at få den til at notificere observer.
 	 public boolean bookShift(Shift shift) {
 	        try {
-	            return shiftDB.bookShift(shift);
+	            boolean result = shiftDB.bookShift(shift);
+	            if (result) {
+	            	shift.bookShift();
+	            }
+	            return result;
 	        } catch (DataAccessException e) {
 	            e.printStackTrace();
-	            return false;
+	           return false;
 	        }
 	    }
 

@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
-public class Shift {
+public class Shift extends AbstractSubject {
 
 	private int startTime;
 	private int endTime;
@@ -35,6 +35,7 @@ public class Shift {
 	public boolean setShiftType(String type) {
 		if (certifications.contains(type)) {
 			this.type = type;
+			notifyObservers(); //observerting
 			return true;
 		}
 		return false;
@@ -99,11 +100,13 @@ public class Shift {
 
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
+		notifyObservers(); //observerting
 	}
 
 	public boolean bookShift() {
 		if (availability) {
 			availability = false;
+			notifyObservers(); //observerting
 			return true;
 		}
 		return false;
