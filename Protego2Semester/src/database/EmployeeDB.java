@@ -2,6 +2,7 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import interfaceDB.EmployeeDBIF;
 import model.Employee;
@@ -18,7 +19,7 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
-		
+
 		try {
 			// this.con = DBConnection.getInstance().getConnection();
 
@@ -29,6 +30,35 @@ public class EmployeeDB implements EmployeeDBIF {
 			throw new RuntimeException("Could not intialize EmployeeDB", e);
 		}
 	}
+	public List<Employee> getAllEmployees() throws DataAccessException {
+	    List<Employee> employees = new ArrayList<>();
+	    String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.Id = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId";
+
+	    try 
+	    (Connection con = db.getConnection(); PreparedStatement stmt = con.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        while (rs.next()) {
+	            Employee e = new Employee(
+	                rs.getInt("Id"),
+	                rs.getString("firstName"),
+	                rs.getString("lastName"),
+	                rs.getString("address"),
+	                rs.getString("city"),
+	                rs.getInt("postalNr"),
+	                rs.getString("phone"),
+	                rs.getString("email")
+	            );
+	            employees.add(e);
+	        }
+	    } catch (SQLException ex) {
+	        throw new DataAccessException("Error reading employees from database", ex);
+	    }
+
+	    return employees;
+	}
+
+	
 
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
@@ -41,7 +71,6 @@ public class EmployeeDB implements EmployeeDBIF {
 		try {
 			// Start transaktion via DBConnection
 			db.startTransaction(con);
-			
 
 			// Check om employee findes
 			String employeeSql = "SELECT COUNT(*) FROM Employee WHERE Id = ?";
@@ -95,7 +124,7 @@ public class EmployeeDB implements EmployeeDBIF {
 		} finally {
 			// Oprydning af ressourcer
 			db.releaseConnection(con);
-		
+
 			try {
 				if (checkEmployeeStmt != null)
 					checkEmployeeStmt.close();
