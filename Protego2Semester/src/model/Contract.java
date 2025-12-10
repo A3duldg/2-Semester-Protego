@@ -11,7 +11,7 @@ public class Contract {
 	private int guardAmount;
 	private boolean active;
 	private boolean confirmed;
-
+	private Certified type;
 	public Contract(int contractId) {
 		
 	
@@ -50,7 +50,14 @@ public class Contract {
 		this.confirmed = confirmed;
 		this.guardAmount = guardAmount;
 	}
-
+	public Certified getType() {
+		return type;
+	}
+	
+	
+	public void setType(Certified type2) {
+		this.type = type2;
+	}
 	
 	public int getGuardAmount() {
 		return guardAmount;

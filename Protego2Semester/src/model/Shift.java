@@ -29,7 +29,7 @@ public class Shift extends AbstractSubject {
 		certifications.add("Brand Vagt");
 
 	}
-
+	
 	// if statementen er til for at sikre at type eksistere inden i listen og så
 	// hvis den gør sætte typen vi har valgt til type og returnerer true ellers
 	// returnerer false.
