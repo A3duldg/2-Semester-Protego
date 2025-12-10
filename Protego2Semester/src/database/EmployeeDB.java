@@ -32,7 +32,7 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
-		Connection con = null;
+		Connection con = db.getConnection();
 		PreparedStatement checkEmployeeStmt = null;
 		PreparedStatement checkShiftStmt = null;
 		PreparedStatement checkExistingStmt = null;
@@ -40,8 +40,8 @@ public class EmployeeDB implements EmployeeDBIF {
 
 		try {
 			// Start transaktion via DBConnection
-			db.startTransaction();
-			con = db.getConnection();
+			db.startTransaction(con);
+			
 
 			// Check om employee findes
 			String employeeSql = "SELECT COUNT(*) FROM Employee WHERE Id = ?";
@@ -82,18 +82,20 @@ public class EmployeeDB implements EmployeeDBIF {
 			}
 
 			// Commit transaktion
-			db.commitTransaction();
+			db.commitTransaction(con);
 
 			System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
 					+ shift.getShiftId());
 
 		} catch (Exception e) {
 			// Rollback ved fejl
-			db.rollbackTransaction();
+			db.rollbackTransaction(con);
 			throw new DataAccessException("Error connecting shift to employee", e);
 
 		} finally {
 			// Oprydning af ressourcer
+			db.releaseConnection(con);
+		
 			try {
 				if (checkEmployeeStmt != null)
 					checkEmployeeStmt.close();
