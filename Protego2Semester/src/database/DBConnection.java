@@ -85,40 +85,28 @@ public class DBConnection {
 
 		
 	
-	public void startTransaction() throws DataAccessException {
+	public void startTransaction(Connection conn) throws DataAccessException {
 		try {
-			((Connection) connection).setAutoCommit(false);
+			conn.setAutoCommit(false);
 		} catch (SQLException e) {
 			
 			throw new DataAccessException("Could not start transaction.", e);
 		}
 	}
 
-	public void commitTransaction() throws DataAccessException {
+	public void commitTransaction(Connection conn) throws DataAccessException {
 		try {
-			try {
-				((Connection) connection).commit();
-			} catch (SQLException e) {
-				throw e;
-				
-			} finally {
-				((Connection) connection).setAutoCommit(true);
-			}
+			conn.commit();
+			conn.setAutoCommit(false);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not commit transaction", e);
 		}
 	}
 
-	public void rollbackTransaction() throws DataAccessException {
+	public void rollbackTransaction(Connection conn) throws DataAccessException {
 		try {
-			try {
-				((Connection) connection).rollback();
-			} catch (SQLException e) {
-				throw e;
-				
-			} finally {
-				((Connection) connection).setAutoCommit(true);
-			}
+			conn.rollback();
+			conn.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not rollback transaction", e);
 		}
