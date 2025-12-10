@@ -12,10 +12,10 @@ private List<Observer> observers = new ArrayList<>();
 
 
 
-public void attach(Observer o) {
+public void attachObserver(Observer o) {
 	observers.add(o);
 }
-public void detach(Observer o) {
+public void detachObserver(Observer o) {
 	observers.remove(o);
 }
 
