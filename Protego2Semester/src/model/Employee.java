@@ -110,7 +110,7 @@ public class Employee implements Observer {
 
 	}
 	public void attachShift(Shift shift) {
-	    shift.attach(this);   // Shift er Subject
+	    shift.attachObserver(this);   // Shift er Subject
 	    observedShifts.add(shift);
 	}
 
