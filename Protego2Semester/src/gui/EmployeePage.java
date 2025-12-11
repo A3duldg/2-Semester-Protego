@@ -99,77 +99,92 @@ public class EmployeePage extends JFrame {
 
 		JButton btnBook = new JButton("Book");
 		btnBook.addActionListener(e -> {
-		    int selectedRow = tblShiftList.getSelectedRow();
-		    if (selectedRow < 0) {
-		        JOptionPane.showMessageDialog(this, "Please select a shift to book.");
-		        return;
-		    }
+			int selectedRow = tblShiftList.getSelectedRow();
+			if (selectedRow < 0) {
+				JOptionPane.showMessageDialog(this, "Please select a shift to book.");
+				return;
+			}
+			JButton btnRefresh = new JButton("Refresh");
+			btnRefresh.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					refreshShiftTable();
+				}
+			});
+			panelButtons.add(btnRefresh);
+			
+			try {
+				// Hent shift-objektet fra modellen
+				Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
+				if (selectedShift == null) {
+					JOptionPane.showMessageDialog(this, "Selected shift not found.", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 
-		    try {
-		        // Hent shift-objektet fra modellen
-		        Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
-		        if (selectedShift == null) {
-		            JOptionPane.showMessageDialog(this, "Selected shift not found.", "Error", JOptionPane.ERROR_MESSAGE);
-		            return;
-		        }
+				// Hent employee og controllers
+				EmployeeController employeeController = new EmployeeController(new EmployeeDB());
+				ShiftController shiftController = new ShiftController();
+				ContractController contractController = new ContractController();
 
-		        // Hent employee og controllers
-		        EmployeeController employeeController = new EmployeeController(new EmployeeDB());
-		        ShiftController shiftController = new ShiftController();
-		        ContractController contractController = new ContractController();
+				Employee loggedInEmployee = employeeController.getEmployeeId(employeeId);
+				if (loggedInEmployee == null) {
+					JOptionPane.showMessageDialog(this, "Logged-in employee not found.", "Error",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 
-		        Employee loggedInEmployee = employeeController.getEmployeeId(employeeId);
-		        if (loggedInEmployee == null) {
-		            JOptionPane.showMessageDialog(this, "Logged-in employee not found.", "Error", JOptionPane.ERROR_MESSAGE);
-		            return;
-		        }
+				// Count booked **for this shift** (IKKE for contract)
+				int bookedForThisShift = shiftController.countEmployeesForShift(selectedShift.getShiftId());
 
-		        // Count booked **for this shift** (IKKE for contract)
-		        int bookedForThisShift = shiftController.countEmployeesForShift(selectedShift.getShiftId());
+				// Hvis shift har en contract: hent contract.guardAmount og brug den som max
+				int contractId = selectedShift.getContract();
+				if (contractId > 0) {
+					Contract contract = contractController.findContractById(contractId);
+					if (contract == null) {
+						JOptionPane.showMessageDialog(this, "Referenced contract not found.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					Integer contractGuardAmount = contract.getGuardAmount();
+					if (contractGuardAmount == null) {
+						JOptionPane.showMessageDialog(this, "Contract has no guardAmount set.", "Error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 
-		        // Hvis shift har en contract: hent contract.guardAmount og brug den som max
-		        int contractId = selectedShift.getContract();
-		        if (contractId > 0) {
-		            Contract contract = contractController.findContractById(contractId);
-		            if (contract == null) {
-		                JOptionPane.showMessageDialog(this, "Referenced contract not found.", "Error", JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
-		            Integer contractGuardAmount = contract.getGuardAmount();
-		            if (contractGuardAmount == null) {
-		                JOptionPane.showMessageDialog(this, "Contract has no guardAmount set.", "Error", JOptionPane.ERROR_MESSAGE);
-		                return;
-		            }
+					// Compare bookedForThisShift vs contract.guardAmount
+					if (bookedForThisShift >= contractGuardAmount) {
+						JOptionPane.showMessageDialog(this,
+								"This contract is fully staffed. No more bookings allowed.");
+						return;
+					}
+					// ellers: ok at booke
+				} else {
+					// Ingen contract på shift — fallback: brug shift.guardAmount som kapacitet
+					int shiftCapacity = selectedShift.getGuardAmount();
+					if (bookedForThisShift >= shiftCapacity) {
+						JOptionPane.showMessageDialog(this, "This shift is fully staffed. No more bookings allowed.");
+						return;
+					}
+				}
 
-		            // Compare bookedForThisShift vs contract.guardAmount
-		            if (bookedForThisShift >= contractGuardAmount) {
-		                JOptionPane.showMessageDialog(this, "This contract is fully staffed. No more bookings allowed.");
-		                return;
-		            }
-		            // ellers: ok at booke
-		        } else {
-		            // Ingen contract på shift — fallback: brug shift.guardAmount som kapacitet
-		            int shiftCapacity = selectedShift.getGuardAmount();
-		            if (bookedForThisShift >= shiftCapacity) {
-		                JOptionPane.showMessageDialog(this, "This shift is fully staffed. No more bookings allowed.");
-		                return;
-		            }
-		        }
+				// Hvis vi når hertil: opret booking
+				employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
+				JOptionPane.showMessageDialog(this, "Shift booked successfully!");
+				refreshShiftTable();
 
-		        // Hvis vi når hertil: opret booking
-		        employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
-		        JOptionPane.showMessageDialog(this, "Shift booked successfully!");
-		        refreshShiftTable();
-
-		    } catch (NumberFormatException ex) {
-		        JOptionPane.showMessageDialog(this, "Please enter valid input.", "Validation", JOptionPane.WARNING_MESSAGE);
-		    } catch (DataAccessException ex) {
-		        JOptionPane.showMessageDialog(this, "Database connection error: " + ex.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
-		    } catch (Exception ex) {
-		        JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		    }
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(this, "Please enter valid input.", "Validation",
+						JOptionPane.WARNING_MESSAGE);
+			} catch (DataAccessException ex) {
+				JOptionPane.showMessageDialog(this, "Database connection error: " + ex.getMessage(), "DB Error",
+						JOptionPane.ERROR_MESSAGE);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		});
-
 
 		panelButtons.add(btnBook);
 
