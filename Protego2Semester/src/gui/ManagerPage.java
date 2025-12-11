@@ -27,6 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionListener;
@@ -99,9 +100,9 @@ public class ManagerPage extends JFrame {
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 
 		// Panel for the table
-		JPanel panelShiftList = new JPanel();
+		JPanel panelShiftList = new JPanel(new BorderLayout());
 		panelShiftList.setBackground(new Color(70, 70, 70));
-		contentPane.add(panelShiftList);
+		contentPane.add(panelShiftList, BorderLayout.CENTER);
 
 		// creating model and tabel
 

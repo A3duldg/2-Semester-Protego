@@ -25,6 +25,7 @@ import java.awt.GridLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class EmployeePage extends JFrame {
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 
 		// Panel for the table
-		JPanel panelShiftList = new JPanel();
+		JPanel panelShiftList = new JPanel(new BorderLayout());
 		panelShiftList.setBackground(new Color(70, 70, 70));
 		contentPane.add(panelShiftList);
 
@@ -90,7 +91,7 @@ public class EmployeePage extends JFrame {
 
 		// Inserting the table into a scrollpane
 		JScrollPane scrollPane = new JScrollPane(tblShiftList);
-		panelShiftList.add(scrollPane);
+		panelShiftList.add(scrollPane, BorderLayout.CENTER);
 
 		// Panel for buttons
 		JPanel panelButtons = new JPanel();
