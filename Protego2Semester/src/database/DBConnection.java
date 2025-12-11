@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 public class DBConnection {
     private static DBConnection instance;
     private final BlockingQueue<Connection> connectionPool;
-    private static final int POOL_SIZE = 10;
+    private static final int POOL_SIZE = 100;
     
     // Connection info
     private static final String DBNAME = "DMA-CSD-V252_10666000";
@@ -97,7 +97,7 @@ public class DBConnection {
 	public void commitTransaction(Connection conn) throws DataAccessException {
 		try {
 			conn.commit();
-			conn.setAutoCommit(false);
+			conn.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not commit transaction", e);
 		}
