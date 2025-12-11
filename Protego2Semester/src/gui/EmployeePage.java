@@ -104,15 +104,7 @@ public class EmployeePage extends JFrame {
 				JOptionPane.showMessageDialog(this, "Please select a shift to book.");
 				return;
 			}
-			JButton btnRefresh = new JButton("Refresh");
-			btnRefresh.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					refreshShiftTable();
-				}
-			});
-			panelButtons.add(btnRefresh);
-			
+
 			try {
 				// Hent shift-objektet fra modellen
 				Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
@@ -187,6 +179,15 @@ public class EmployeePage extends JFrame {
 		});
 
 		panelButtons.add(btnBook);
+		
+		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				refreshShiftTable();
+			}
+		});
+		panelButtons.add(btnRefresh);
 
 		JButton btnInfo = new JButton("Info");
 		btnInfo.addActionListener(new ActionListener() {
