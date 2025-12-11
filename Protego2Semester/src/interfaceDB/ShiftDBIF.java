@@ -17,7 +17,7 @@ boolean setShiftType(Shift shift)throws DataAccessException;
 
 boolean bookShift(Shift shift)throws DataAccessException;
 
-
+int countEmployeesForShift(int shiftId) throws DataAccessException;
 
 
 

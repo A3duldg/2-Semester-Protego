@@ -1,20 +1,19 @@
 package interfaceDB;
+
 import database.DataAccessException;
 import java.util.List;
 import model.Employee;
-import model.Manager;
 import model.Shift;
 
 public interface EmployeeDBIF {
 
+    void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException;
 
-	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException;
+    Employee getEmployeeId(int employeeId) throws DataAccessException;
 
-	Employee getEmployeeId(int employeeId);
-
-    default Employee findActiveEmployee (int employeeId) throws DataAccessException {
+    default Employee findActiveEmployee(int employeeId) throws DataAccessException {
         return getEmployeeId(employeeId);
     }
 
-	List<Employee> getAllEmployees() throws DataAccessException;
+    List<Employee> getAllEmployees() throws DataAccessException;
 }

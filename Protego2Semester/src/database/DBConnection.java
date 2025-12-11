@@ -6,7 +6,7 @@ import java.util.concurrent.*;
 public class DBConnection {
     private static DBConnection instance;
     private final BlockingQueue<Connection> connectionPool;
-    private static final int POOL_SIZE = 10;
+    private static final int POOL_SIZE = 100;
     
     // Connection info
     private static final String DBNAME = "DMA-CSD-V252_10666000";

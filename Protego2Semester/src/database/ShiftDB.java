@@ -14,9 +14,9 @@ public class ShiftDB implements ShiftDBIF {
 
 
 
-	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, type, availability FROM Shift WHERE availability = ?";
+	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId FROM Shift WHERE availability = ?";
 
-	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability) VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability, contractId) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET type = ? WHERE shiftId = ?";
 
@@ -34,8 +34,7 @@ public class ShiftDB implements ShiftDBIF {
 		List<Shift> list = new ArrayList<>();
 
 		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement stmt = con.prepareStatement(
-						"SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, type, availability FROM Shift WHERE availability = ?")) {
+				PreparedStatement stmt = con.prepareStatement(FIND_SHIFT_BY_AVAILABILITY_Q)) {
 
 			stmt.setBoolean(1, availability);
 
@@ -44,6 +43,14 @@ public class ShiftDB implements ShiftDBIF {
 					Shift shift = new Shift(rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("guardAmount"),
 							rs.getString("shiftLocation"), rs.getBoolean("availability"), rs.getInt("shiftId"));
 					shift.setShiftType(rs.getString("type"));
+					Integer contractIdObj = null;
+                    try {
+                        contractIdObj = rs.getObject("contractId", Integer.class);
+                    } catch (SQLException ignore) {
+                        // Hvis kolonnen ikke findes, forbliver contractIdObj null
+                    }
+                    int contractId = (contractIdObj != null) ? contractIdObj.intValue() : 0;
+                    shift.setContractId(contractId); // Tjek den her
 					list.add(shift);
 				}
 			}
@@ -59,9 +66,7 @@ public class ShiftDB implements ShiftDBIF {
 		int newId = -1;
 
 		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement stmt = con.prepareStatement(
-						"INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability) VALUES (?, ?, ?, ?, ?, ?)",
-						Statement.RETURN_GENERATED_KEYS)) {
+				PreparedStatement stmt = con.prepareStatement(CREATE_SHIFT_Q, Statement.RETURN_GENERATED_KEYS)) {
 
 			stmt.setInt(1, shift.getStartTime());
 			stmt.setInt(2, shift.getEndTime());
@@ -71,20 +76,28 @@ public class ShiftDB implements ShiftDBIF {
 			stmt.setBoolean(6, shift.isAvailable());
 			stmt.setInt(7, shift.getContract());
 
-			int rows = stmt.executeUpdate();
+			int cid = shift.getContract();
+	        if (cid > 0) {
+	            stmt.setInt(7, cid);
+	        } else {
+	            stmt.setNull(7, java.sql.Types.INTEGER);
+	        }
 
-			if (rows > 0) {
-				try (ResultSet rs = stmt.getGeneratedKeys()) {
-					if (rs.next()) {
-						newId = rs.getInt(1);
-					}
-				}
-			}
+	        int rows = stmt.executeUpdate();
 
-		} catch (SQLException | DataAccessException e) {
-			e.printStackTrace();
-		}
-		return newId;
+	        if (rows > 0) {
+	            try (ResultSet rs = stmt.getGeneratedKeys()) {
+	                if (rs.next()) {
+	                    newId = rs.getInt(1);
+	                }
+	            }
+	        }
+
+	    } catch (SQLException | DataAccessException e) {
+	        // log fejlen (evt. vis venlig besked i UI)
+	        e.printStackTrace();
+	    }
+	    return newId;
 	}
 
 	@Override

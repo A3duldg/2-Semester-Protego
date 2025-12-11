@@ -1,5 +1,4 @@
-/controller/
-/gui/
-/model/
 /database/
+/gui/
+/controller/
 /interfaceDB/

@@ -1,6 +1,9 @@
 package database;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import interfaceDB.ContractDBIF;
 import model.Contract;
 
@@ -12,110 +15,175 @@ public class ContractDB implements ContractDBIF {
 		db = DBConnection.getInstance();
 	}
 
-
-	
 	public Contract findContractById(int contractId) throws DataAccessException {
-	    Contract contract = null;
-	    String sql = "SELECT contractId, employeeId, startDate, endDate FROM Contract WHERE contractId = ?";
+		Contract contract = null;
+		String sql = "SELECT contractId, guardAmount, startDate, endDate FROM Contract WHERE contractId = ?";
 
-	    try (Connection con = DBConnection.getInstance().getConnection();
-	         PreparedStatement stmt = con.prepareStatement(sql)) {
+		try (Connection con = DBConnection.getInstance().getConnection();
+				PreparedStatement stmt = con.prepareStatement(sql)) {
 
-	        stmt.setInt(1, contractId);
+			stmt.setInt(1, contractId);
 
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                // Use the one-argument constructor
-	                contract = new Contract(rs.getInt("contractId"));
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					Integer cid = rs.getObject("contractId", Integer.class);
+					if (cid == null) {
+						// Usædvanligt: fundet en række uden contractId
+						System.err.println("findContractById: contractId var NULL for søgning på id=" + contractId);
+						return null;
+					}
+					contract = new Contract(cid);
+					
+					Integer guardAmt = rs.getObject("guardAmount", Integer.class);
+	                if (guardAmt != null) {
+	                    contract.setGuardAmount(guardAmt);
+	                }
 
-	                // Set other fields via setters
-	                contract.setEmployeeId(rs.getInt("employeeId"));
-	                contract.setStartDate(rs.getDate("startDate").toLocalDate());
-	                contract.setEndDate(rs.getDate("endDate").toLocalDate());
-	            }
-	        }
-	    } catch (SQLException e) {
-	        throw new DataAccessException("Error finding contract", e);
-	    }
+					Date sd = rs.getDate("startDate");
+					if (sd != null)
+						contract.setStartDate(sd.toLocalDate());
 
-	    return contract;
+					Date ed = rs.getDate("endDate");
+					if (ed != null)
+						contract.setEndDate(ed.toLocalDate());
+				}
+			}
+		} catch (SQLException e) {
+		    // Print fuld JDBC-fejl til konsol for at finde root-cause, så vi kan fixe den præcist.
+		    System.err.println("ContractDB.findContractById: SQLException: " + e.getMessage());
+		    e.printStackTrace(System.err);
+		    throw new DataAccessException("Error finding contract", e);
+		}
+
+		return contract;
 	}
-
-
 
 	@Override
-	public Contract confirmContract() {
-	    Contract contract = null;
+	public Contract confirmContract() throws DataAccessException {
+		Contract contract = null;
 
-	    String findActiveSql = "SELECT contractId FROM Contract WHERE active = 1"; 
-	    String confirmSql = "UPDATE Contract SET confirmed = 1 WHERE contractId = ?";
+		String findActiveSql = "SELECT contractId FROM Contract WHERE active = 1";
+		String confirmSql = "UPDATE Contract SET confirmed = 1 WHERE contractId = ?";
 
-	    try (Connection con = DBConnection.getInstance().getConnection();
-	         PreparedStatement findStmt = con.prepareStatement(findActiveSql);
-	         ResultSet rs = findStmt.executeQuery()) {
+		 try (Connection con = DBConnection.getInstance().getConnection()) {
+	            boolean oldAutoCommit = con.getAutoCommit();
+	            con.setAutoCommit(false);
+	            try (PreparedStatement findStmt = con.prepareStatement(findActiveSql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+	                 ResultSet rs = findStmt.executeQuery()) {
 
-	        if (rs.next()) {
-	            int id = rs.getInt("contractId");
-
-	            try (PreparedStatement confirmStmt = con.prepareStatement(confirmSql)) {
-	                confirmStmt.setInt(1, id);
-	                int updated = confirmStmt.executeUpdate();
-
-	                if (updated > 0) {
-	                    contract = new Contract(id);
+	                if (rs.next()) {
+	                    Integer id = rs.getObject("contractId", Integer.class);
+	                    if (id != null) {
+	                        try (PreparedStatement confirmStmt = con.prepareStatement(confirmSql)) {
+	                            confirmStmt.setInt(1, id);
+	                            int updated = confirmStmt.executeUpdate();
+	                            if (updated > 0) {
+	                                contract = new Contract(id);
+	                            } else {
+	                                con.rollback();
+	                                System.err.println("confirmContract: UPDATE påvirkede 0 rækker for contractId=" + id);
+	                            }
+	                        }
+	                    } else {
+	                        System.err.println("confirmContract: fundet aktiv kontrakt-række uden contractId");
+	                    }
 	                }
+	                con.commit();
+	            } catch (SQLException e) {
+	                con.rollback();
+	                throw e;
+	            } finally {
+	                con.setAutoCommit(oldAutoCommit);
 	            }
+	        } catch (SQLException e) {
+	            throw new DataAccessException("Error confirming contract", e);
 	        }
-	    } catch (SQLException | DataAccessException e) {
-	        e.printStackTrace();
-	    }
 
-	    return contract;
+	        return contract;
 	}
-	
+
 	public int countBookedGuardsForContract(int contractId) throws DataAccessException {
-	    String sql = "SELECT COUNT(*) FROM EmployeeShift es JOIN Shift s ON es.shiftId = s.shiftId WHERE s.contractId = ?";
-	    try (Connection con = DBConnection.getInstance().getConnection();
-	         PreparedStatement stmt = con.prepareStatement(sql)) {
-	        stmt.setInt(1, contractId);
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                return rs.getInt(1);
-	            }
-	        }
-	    } catch (SQLException e) {
-	        throw new DataAccessException("Error counting booked guards for contract", e);
-	    }
-	    return 0;
+		String sql = "SELECT COUNT(*) FROM EmployeeShift es JOIN Shift s ON es.shiftId = s.shiftId WHERE s.contractId = ?";
+		try (Connection con = DBConnection.getInstance().getConnection();
+				PreparedStatement stmt = con.prepareStatement(sql)) {
+			stmt.setInt(1, contractId);
+			try (ResultSet rs = stmt.executeQuery()) {
+				if (rs.next()) {
+					return rs.getInt(1);
+				}
+			}
+		} catch (SQLException e) {
+			throw new DataAccessException("Error counting booked guards for contract", e);
+		}
+		return 0;
 	}
-	
+
 	// Added this method
 	@Override
 	public Contract findActiveContract(int employeeId) throws DataAccessException {
-	    Contract contract = null;
-	    String sql = "SELECT contractId, employeeId, startDate, endDate " +
-	                 "FROM Contract WHERE employeeId = ? AND active = 1";
+		Contract contract = null;
+		   String sql = "SELECT contractId, employeeId, startDate, endDate FROM Contract WHERE employeeId = ? AND active = 1";
+
+		try (Connection con = DBConnection.getInstance().getConnection();
+				PreparedStatement stmt = con.prepareStatement(sql)) {
+
+			stmt.setInt(1, employeeId);
+
+			 try (ResultSet rs = stmt.executeQuery()) {
+	                if (rs.next()) {
+	                    Integer cid = rs.getObject("contractId", Integer.class);
+	                    if (cid == null) return null;
+	                    contract = new Contract(cid);
+
+	                    Integer empId = rs.getObject("employeeId", Integer.class);
+	                    if (empId != null) contract.setEmployeeId(empId);
+
+	                    Date sd = rs.getDate("startDate");
+	                    if (sd != null) contract.setStartDate(sd.toLocalDate());
+
+	                    Date ed = rs.getDate("endDate");
+	                    if (ed != null) contract.setEndDate(ed.toLocalDate());
+	                }
+	            }
+	        } catch (SQLException e) {
+	            throw new DataAccessException("Error finding active contract", e);
+	        }
+
+	        return contract;
+	    }
+	
+	public List<Contract> findAllContracts() throws DataAccessException {
+	    List<Contract> list = new ArrayList<>();
+	    String sql = "SELECT contractId, guardAmount, StartDate, EndDate FROM Contract";
 
 	    try (Connection con = DBConnection.getInstance().getConnection();
-	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	         PreparedStatement stmt = con.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
 
-	        stmt.setInt(1, employeeId);
+	        while (rs.next()) {
+	            Integer cid = rs.getObject("contractId", Integer.class);
+	            if (cid == null) continue;
 
-	        try (ResultSet rs = stmt.executeQuery()) {
-	            if (rs.next()) {
-	                contract = new Contract(rs.getInt("contractId"));
-	                contract.setEmployeeId(rs.getInt("employeeId"));
-	                contract.setStartDate(rs.getDate("startDate").toLocalDate());
-	                contract.setEndDate(rs.getDate("endDate").toLocalDate());
-	            }
+	            Contract c = new Contract(cid);
+
+	            Integer guardAmt = null;
+	            try { guardAmt = rs.getObject("guardAmount", Integer.class); } catch (SQLException ignore) {}
+	            if (guardAmt != null) c.setGuardAmount(guardAmt);
+
+	            java.sql.Date sd = null;
+	            try { sd = rs.getDate("StartDate"); } catch (SQLException ignore) {}
+	            if (sd != null) c.setStartDate(sd.toLocalDate());
+
+	            java.sql.Date ed = null;
+	            try { ed = rs.getDate("EndDate"); } catch (SQLException ignore) {}
+	            if (ed != null) c.setEndDate(ed.toLocalDate());
+
+	            list.add(c);
 	        }
 	    } catch (SQLException e) {
-	        throw new DataAccessException("Error finding active contract", e);
+	        throw new DataAccessException("Error reading contracts", e);
 	    }
-
-	    return contract;
+	    return list;
 	}
 
-
-
-}
+	}

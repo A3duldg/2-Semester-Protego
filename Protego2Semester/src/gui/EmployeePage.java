@@ -99,47 +99,77 @@ public class EmployeePage extends JFrame {
 
 		JButton btnBook = new JButton("Book");
 		btnBook.addActionListener(e -> {
-			int selectedRow = tblShiftList.getSelectedRow();
-			if (selectedRow >= 0) {
-				int shiftId = (int) tblShiftList.getValueAt(selectedRow, 0); // assuming column 0 is shiftId
-				try {
-					// Fetch the selected shift from your table model
-					Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
+		    int selectedRow = tblShiftList.getSelectedRow();
+		    if (selectedRow < 0) {
+		        JOptionPane.showMessageDialog(this, "Please select a shift to book.");
+		        return;
+		    }
 
-					// Create EmployeeController (you may want to inject it instead of new)
-					EmployeeController employeeController = new EmployeeController(new EmployeeDB());
-					ContractController contractController = new ContractController();
+		    try {
+		        // Hent shift-objektet fra modellen
+		        Shift selectedShift = shiftTableModel.getShiftOfRow(selectedRow);
+		        if (selectedShift == null) {
+		            JOptionPane.showMessageDialog(this, "Selected shift not found.", "Error", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
 
+		        // Hent employee og controllers
+		        EmployeeController employeeController = new EmployeeController(new EmployeeDB());
+		        ShiftController shiftController = new ShiftController();
+		        ContractController contractController = new ContractController();
 
-					// Look up the logged-in employee (you already have employeeId)
+		        Employee loggedInEmployee = employeeController.getEmployeeId(employeeId);
+		        if (loggedInEmployee == null) {
+		            JOptionPane.showMessageDialog(this, "Logged-in employee not found.", "Error", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
 
-					Employee loggedInEmployee = employeeController.getEmployeeId(employeeId); // assuming you have a
-																								// findById method
+		        // Count booked **for this shift** (IKKE for contract)
+		        int bookedForThisShift = shiftController.countEmployeesForShift(selectedShift.getShiftId());
 
-					//Find contract assigned to shift
-					Contract contract = contractController.findContractById(selectedShift.getContract());
-					
-					// Count number of guards on a booking
-					int booked = contractController.countBookedGuardsForContract(contract.getContract());
-					
-					if(booked < contract.getGuardAmount()) {
-					// Connect employee to shift
-					employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
+		        // Hvis shift har en contract: hent contract.guardAmount og brug den som max
+		        int contractId = selectedShift.getContract();
+		        if (contractId > 0) {
+		            Contract contract = contractController.findContractById(contractId);
+		            if (contract == null) {
+		                JOptionPane.showMessageDialog(this, "Referenced contract not found.", "Error", JOptionPane.ERROR_MESSAGE);
+		                return;
+		            }
+		            Integer contractGuardAmount = contract.getGuardAmount();
+		            if (contractGuardAmount == null) {
+		                JOptionPane.showMessageDialog(this, "Contract has no guardAmount set.", "Error", JOptionPane.ERROR_MESSAGE);
+		                return;
+		            }
 
-					JOptionPane.showMessageDialog(this, "Shift booked successfully!");
-					refreshShiftTable();
-					} else {
-						JOptionPane.showMessageDialog(this, "This contract is fully staffed. No more bookings allowed.");
-					}
-				} catch (IllegalStateException ex) {
-					JOptionPane.showMessageDialog(this, "Error booking shift: " + ex.getMessage());
-				} catch (DataAccessException ex) {
-					JOptionPane.showMessageDialog(this, "Database connection error: " + ex.getMessage());
-				}
-				} else {
-				JOptionPane.showMessageDialog(this, "Please select a shift to book.");
-			}
+		            // Compare bookedForThisShift vs contract.guardAmount
+		            if (bookedForThisShift >= contractGuardAmount) {
+		                JOptionPane.showMessageDialog(this, "This contract is fully staffed. No more bookings allowed.");
+		                return;
+		            }
+		            // ellers: ok at booke
+		        } else {
+		            // Ingen contract på shift — fallback: brug shift.guardAmount som kapacitet
+		            int shiftCapacity = selectedShift.getGuardAmount();
+		            if (bookedForThisShift >= shiftCapacity) {
+		                JOptionPane.showMessageDialog(this, "This shift is fully staffed. No more bookings allowed.");
+		                return;
+		            }
+		        }
+
+		        // Hvis vi når hertil: opret booking
+		        employeeController.connectShiftToEmployee(loggedInEmployee, selectedShift);
+		        JOptionPane.showMessageDialog(this, "Shift booked successfully!");
+		        refreshShiftTable();
+
+		    } catch (NumberFormatException ex) {
+		        JOptionPane.showMessageDialog(this, "Please enter valid input.", "Validation", JOptionPane.WARNING_MESSAGE);
+		    } catch (DataAccessException ex) {
+		        JOptionPane.showMessageDialog(this, "Database connection error: " + ex.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
+		    } catch (Exception ex) {
+		        JOptionPane.showMessageDialog(this, "Unexpected error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		    }
 		});
+
 
 		panelButtons.add(btnBook);
 

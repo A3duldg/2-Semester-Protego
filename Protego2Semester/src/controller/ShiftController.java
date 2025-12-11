@@ -57,7 +57,7 @@ public class ShiftController {
 	    }
 
 
-	 public int createShift(Shift shift) {
+	 public int createShift(Shift shift) throws DataAccessException{
 	        try {
 	            return shiftDB.createShift(shift);
 	        } catch (DataAccessException e) {
@@ -191,8 +191,13 @@ public class ShiftController {
 				Shift shift = removeFromProcessing();
 
 				if (shift != null) {
-					int id = createShift(shift); // Skulle være en transaction
-					System.out.println("Vagt oprettet" + id);
+					int id;
+					try {
+						id = createShift(shift);
+						System.out.println("Shift created" + id);
+					} catch (DataAccessException e) {
+						System.err.println("Error in creation of shift: " + e.getMessage());
+					} // Skulle være en transaction
 					processed++;
 				}
 				try {
@@ -214,4 +219,8 @@ public class ShiftController {
 		}
 		System.out.println("Oprettelse og udgivelse færdig. Totale vagter: " + getTotalShiftsCreated());
 	}
+	 public int countEmployeesForShift(int shiftId) throws DataAccessException {
+	        return shiftDB.countEmployeesForShift(shiftId);
+	    }
+	 
 }

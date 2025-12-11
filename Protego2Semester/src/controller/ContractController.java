@@ -1,6 +1,9 @@
 package controller;
 import interfaceDB.ContractDBIF;
 import model.Contract;
+
+import java.util.List;
+
 import database.ContractDB;
 import database.DataAccessException;
 
@@ -30,5 +33,12 @@ public class ContractController {
 		int booked = contractDB.countBookedGuardsForContract(contractId);
 		return booked >= contract.getGuardAmount();
 
+	}
+	public List<Contract> getAllContracts() throws DataAccessException {
+	    try {
+	        return new ContractDB().findAllContracts();
+	    } catch (DataAccessException dae) {
+	        throw dae;
+	    }
 	}
 }
