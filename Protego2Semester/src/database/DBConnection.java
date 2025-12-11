@@ -1,116 +1,112 @@
 package database;
 
 import java.sql.*;
-
-import database.DBConnection;
-import database.DataAccessException;
+import java.util.concurrent.*;
 
 public class DBConnection {
-	private Connection connection = null;
-	private static DBConnection dbConnection;
-	
-	private static final String DBNAME = "DMA-CSD-V252_10666000";
-	private static final String SERVERNAME = "hildur.ucn.dk";
-	private static final int PORTNUMBER = 1433;
-	private static final String USERNAME = "DMA-CSD-V252_10666000";
-	private static final String PASSWORD = "Password1!";
-
-	/*private static final String DBNAME = "Protego_system";
-	private static final String SERVERNAME = "localhost";
-	private static final int PORTNUMBER = 1433;
-	private static final String USERNAME = "sa";
-	private static final String PASSWORD = "secret2025*"; */
-
-	private DBConnection() throws DataAccessException {
-		try {
-			this.connection = createNewConnection();
-		} catch (SQLException e) {
-			throw new DataAccessException(String.format("Could not connect to database %s@%s:%d user %s", DBNAME,
-					SERVERNAME, PORTNUMBER, USERNAME), e);
-		}
-	}
-
-	private Connection createNewConnection() throws SQLException {
-		String urlString = String.format("jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false", SERVERNAME, PORTNUMBER,
-				DBNAME);
-		return  DriverManager.getConnection(urlString, USERNAME, PASSWORD);
-		
-	}
-
-	public static synchronized DBConnection getInstance() throws DataAccessException {
-		if (dbConnection == null) {
-			dbConnection = new DBConnection();
-		}
-		return dbConnection;
-	}
-
-	
-	
-	
-	public Connection getConnection() throws DataAccessException {
-	    try {
-	        if (connection == null || connection.isClosed()) {
-	            this.connection = createNewConnection();
-	        }
-	        return connection;
-	    } catch (SQLException e) {
-	        throw new DataAccessException(
-	            String.format("Could not connect to database %s@%s:%d user %s",
-	                DBNAME, SERVERNAME, PORTNUMBER, USERNAME), e );
-	    }
-	}
-
-
-
-	public void disconnect() throws DataAccessException {
-		if (connection != null) {
+    private static DBConnection instance;
+    private final BlockingQueue<Connection> connectionPool;
+    private static final int POOL_SIZE = 10;
+    
+    // Connection info
+    private static final String DBNAME = "DMA-CSD-V252_10666000";
+    private static final String SERVERNAME = "hildur.ucn.dk";
+    private static final int PORTNUMBER = 1433;
+    private static final String USERNAME = "DMA-CSD-V252_10666000";
+    private static final String PASSWORD = "Password1!";
+    
+    private DBConnection() throws DataAccessException {
+        connectionPool = new LinkedBlockingQueue<>(POOL_SIZE);
+        initializePool();
+    }
+    
+    private void initializePool() throws DataAccessException {
+        try {
+            for (int i = 0; i < POOL_SIZE; i++) {
+                Connection conn = createNewConnection();
+                connectionPool.offer(conn);
+            }
+            System.out.println("Connection pool initialized with " + POOL_SIZE + " connections");
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to initialize pool", e);
+        }
+    }
+    
+    private Connection createNewConnection() throws SQLException {
+        String urlString = String.format(
+            "jdbc:sqlserver://%s:%d;databaseName=%s;encrypt=false",
+            SERVERNAME, PORTNUMBER, DBNAME
+        );
+        return DriverManager.getConnection(urlString, USERNAME, PASSWORD);
+    }
+    
+    public static synchronized DBConnection getInstance() throws DataAccessException {
+        if (instance == null) {
+            instance = new DBConnection();
+        }
+        return instance;
+    }
+    
+    public Connection getConnection() throws DataAccessException {
+        try {
+            Connection conn = connectionPool.poll(5, TimeUnit.SECONDS);
+            
+            if (conn == null) {
+                throw new DataAccessException(
+                    "Connection pool exhausted - no connections available",
+                    new SQLException("Timeout waiting for connection")
+                );
+            }
+            
+            if (conn.isClosed()) {
+                conn = createNewConnection();
+            }
+            
+            return conn;
+            
+        } catch (SQLException | InterruptedException e) {
+            throw new DataAccessException("Error getting connection", e);
+        }
+    }
+    
+    public void releaseConnection(Connection conn) {
+        if (conn != null) {
             try {
-                connection.close();
+                if (!conn.isClosed()) {
+                    connectionPool.offer(conn);
+                } else {
+                    System.err.println("Warning: Attempted to release closed connection");
+                }
             } catch (SQLException e) {
-				throw new DataAccessException(String.format("Could not close the connection to database %s@%s:%d", DBNAME,
-						SERVERNAME, PORTNUMBER), e);
-            } finally {
-                connection = null;
+                System.err.println("Error checking connection: " + e.getMessage());
             }
         }
-	}
+    }
 
 		
 	
-	public void startTransaction() throws DataAccessException {
+	public void startTransaction(Connection conn) throws DataAccessException {
 		try {
-			connection.setAutoCommit(false);
+			conn.setAutoCommit(false);
 		} catch (SQLException e) {
 			
 			throw new DataAccessException("Could not start transaction.", e);
 		}
 	}
 
-	public void commitTransaction() throws DataAccessException {
+	public void commitTransaction(Connection conn) throws DataAccessException {
 		try {
-			try {
-				connection.commit();
-			} catch (SQLException e) {
-				throw e;
-				
-			} finally {
-				connection.setAutoCommit(true);
-			}
+			conn.commit();
+			conn.setAutoCommit(false);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not commit transaction", e);
 		}
 	}
 
-	public void rollbackTransaction() throws DataAccessException {
+	public void rollbackTransaction(Connection conn) throws DataAccessException {
 		try {
-			try {
-				connection.rollback();
-			} catch (SQLException e) {
-				throw e;
-				
-			} finally {
-				connection.setAutoCommit(true);
-			}
+			conn.rollback();
+			conn.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not rollback transaction", e);
 		}
@@ -118,7 +114,7 @@ public class DBConnection {
 
 	public int executeInsertWithIdentity(String sql) throws DataAccessException {
 		int res = -1;
-		try (Statement s = connection.createStatement()) {
+		try (Statement s = ((Connection) instance).createStatement()) {
 			res = s.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 			if (res > 0) {
 				ResultSet rs = s.getGeneratedKeys();

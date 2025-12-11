@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 
-public class Shift {
+public class Shift extends AbstractSubject {
 
 	private int startTime;
 	private int endTime;
@@ -11,6 +11,7 @@ public class Shift {
 	private String type;
 	private boolean availability;
 	private int shiftId;
+	private int contractId;
 
 	private ArrayList<String> certifications;
 
@@ -28,13 +29,14 @@ public class Shift {
 		certifications.add("Brand Vagt");
 
 	}
-
+	
 	// if statementen er til for at sikre at type eksistere inden i listen og så
 	// hvis den gør sætte typen vi har valgt til type og returnerer true ellers
 	// returnerer false.
 	public boolean setShiftType(String type) {
 		if (certifications.contains(type)) {
 			this.type = type;
+			notifyObservers(); //observerting
 			return true;
 		}
 		return false;
@@ -60,9 +62,18 @@ public class Shift {
 		return certifications;
 
 	}
+	
+	public void setContractId(int contractId) {
+	    this.contractId = contractId;
+	}
+
 
 	public int getStartTime() {
 		return startTime;
+	}
+	
+	public int getContract() {
+		return contractId;
 	}
 
 	public void setStartTime(int startTime) {
@@ -99,11 +110,13 @@ public class Shift {
 
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
+		notifyObservers(); //observerting
 	}
 
 	public boolean bookShift() {
 		if (availability) {
 			availability = false;
+			notifyObservers(); //observerting
 			return true;
 		}
 		return false;

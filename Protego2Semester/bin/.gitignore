@@ -1,2 +1,5 @@
-/database/
+/controller/
+/gui/
 /model/
+/database/
+/interfaceDB/

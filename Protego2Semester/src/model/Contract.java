@@ -8,20 +8,20 @@ public class Contract {
 	private int employeeId;
 	private LocalDate startDate;
 	private LocalDate endDate;
+	private int guardAmount;
 	private boolean active;
 	private boolean confirmed;
-
+	private Certified type;
 	public Contract(int contractId) {
-		if (contractId <= 0) {
-			throw new IllegalArgumentException("Contract ID must be bigger than 0");
-		}
+		
+	
 		this.contractId = contractId;
 		this.active = true;
 		this.confirmed = true;
 	}
 
 	public Contract(int contractId, int employeeId, LocalDate startDate, LocalDate endDate, boolean active,
-			boolean confirmed) {
+			boolean confirmed, int guardAmount) {
 		//Validation
 		if (contractId <= 0) {
 			throw new IllegalArgumentException("Contract ID must be positive");
@@ -38,6 +38,9 @@ public class Contract {
 		if (endDate.isBefore(startDate)) {
 			throw new IllegalArgumentException("End date must be after start date");
 		}
+		if (guardAmount <= 0) {
+			throw new IllegalArgumentException("There needs to be at least 1 or more guards needed");
+		}
 
 		this.contractId = contractId;
 		this.employeeId = employeeId;
@@ -45,10 +48,19 @@ public class Contract {
 		this.endDate = endDate;
 		this.active = active;
 		this.confirmed = confirmed;
+		this.guardAmount = guardAmount;
 	}
-
-	public int getContactId() {
-		return contractId;
+	public Certified getType() {
+		return type;
+	}
+	
+	
+	public void setType(Certified type2) {
+		this.type = type2;
+	}
+	
+	public int getGuardAmount() {
+		return guardAmount;
 	}
 
 	public int getContract() {
@@ -75,6 +87,13 @@ public class Contract {
 		return confirmed;
 	}
 	
+	public void setGuardAmount(int guardAmount) {
+		if (guardAmount <= 0) {
+			throw new IllegalArgumentException("There needs to be at least 1 or more guards needed");
+		}
+		this.guardAmount = guardAmount;
+	}
+	
 	public void setEmployeeId(int employeeId) {
         if (employeeId <= 0) {
             throw new IllegalArgumentException("Employee ID must be bigger than 0");
@@ -92,7 +111,7 @@ public class Contract {
 		this.endDate = endDate;
 	}
 
-	public void setStartDate(LocalDate localDate, LocalDate startDate) {
+	public void setStartDate(LocalDate startDate) {
 		if (startDate == null) {
 			throw new IllegalArgumentException("Start date cannot be null");
 		}

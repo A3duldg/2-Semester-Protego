@@ -1,8 +1,9 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Employee {
+public class Employee implements Observer {
 	private int employeeId;
 	private String firstName;
 	private String lastName;
@@ -12,8 +13,13 @@ public class Employee {
 	private String phone;
 	private String email;
 	private ArrayList<Shift> shifts = new ArrayList<>();
+	private List<Shift> relevantShifts = new ArrayList<>();
+	private List<Shift> observedShifts = new ArrayList<>();
 
-	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,String phone, String email) {
+
+
+	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,
+			String phone, String email) {
 		this.employeeId = employeeId;
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -26,7 +32,7 @@ public class Employee {
 
 	}
 
-public String getFirstName() {
+	public String getFirstName() {
 		return firstName;
 	}
 
@@ -95,6 +101,25 @@ public String getFirstName() {
 			throw new IllegalArgumentException("må ikke være den samme vagt");
 		}
 		shifts.add(shift);
+	}
+
+// her er nogle ting som hører til observerPattern.
+	@Override
+	public void updateObserver() {
+		relevantShifts();
+
+	}
+	public void attachShift(Shift shift) {
+	    shift.attachObserver(this);   // Shift er Subject
+	    observedShifts.add(shift);
+	}
+
+
+	private void relevantShifts() {
+	    relevantShifts.clear();
+	    for (Shift s : observedShifts) {
+	        relevantShifts.add(s);
+	    }
 	}
 
 }

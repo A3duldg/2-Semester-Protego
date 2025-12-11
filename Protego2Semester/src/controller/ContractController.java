@@ -16,4 +16,19 @@ public class ContractController {
 	public Contract confirmContract() throws DataAccessException {
 		return contractDB.confirmContract();
 	}
+	
+	public Contract findContractById(int contractId) throws DataAccessException {
+		return contractDB.findContractById(contractId);
+	}
+	
+	public int countBookedGuardsForContract(int contractId) throws DataAccessException {
+		return contractDB.countBookedGuardsForContract(contractId);
+	}
+	
+	public boolean isFullyStaffed(int contractId) throws DataAccessException {
+		Contract contract = contractDB.findContractById(contractId);
+		int booked = contractDB.countBookedGuardsForContract(contractId);
+		return booked >= contract.getGuardAmount();
+
+	}
 }

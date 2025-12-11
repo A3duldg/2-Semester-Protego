@@ -5,11 +5,14 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import controller.ContractController;
+import database.DataAccessException;
+import model.Contract;
 import model.Shift;
 
 public class ShiftTableModel extends AbstractTableModel {
 	private List<Shift> data;
-	private static final String[] COL_NAMES = { "ID", "Start", "End", "Guards", "Location", "Type", "Available" };
+	private static final String[] COL_NAMES = { "ID", "Start", "End", "Guards", "Location", "Type", "Available", "Staffing" };
 
 	public ShiftTableModel() {
 		setData(null);
@@ -49,6 +52,9 @@ public class ShiftTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int row, int column) {
 		Shift s = data.get(row);
+		//Debugging
+		System.out.println("Shift ID: " + s.getShiftId() + ", Contract ID: " + s.getContract());
+		
 		switch (column) {
 
 		case 0: 
@@ -65,6 +71,20 @@ public class ShiftTableModel extends AbstractTableModel {
         	return s.getType();
         case 6: 
         	return s.isAvailable() ? "Yes" : "No";
+        case 7:{
+        	try {
+        		// looks up the contract
+                ContractController contractController = new ContractController();
+                Contract contract = contractController.findContractById(s.getContract());
+                int booked = contractController.countBookedGuardsForContract(contract.getContract());
+                int needed = contract.getGuardAmount();
+                return booked + " / " + needed;
+            } catch (DataAccessException e) {
+                return "Error";
+            }
+
+        }
+        	
 		default:
 			return "UNKNOLWN COL NAME";
 		}

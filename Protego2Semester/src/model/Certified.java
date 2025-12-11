@@ -1,0 +1,10 @@
+package model;
+
+public enum Certified {
+BRANDVAGT,
+SERVICEVAGT,
+BYGGEPLADSVAGT,
+DØRMAND,
+FASTVAGT,
+CENTERVAGT;
+}
