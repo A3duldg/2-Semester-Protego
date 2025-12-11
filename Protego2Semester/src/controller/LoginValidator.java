@@ -51,7 +51,7 @@ public class LoginValidator {
         }
 
         EmployeeDB employeeDB = new EmployeeDB();
-        Employee employee = employeeDB.getEmployeeId(parseId); // ✅ use findEmployeeId
+        Employee employee = employeeDB.getEmployeeId(parseId);
         if (employee != null) {
             return Role.EMPLOYEE;
         }

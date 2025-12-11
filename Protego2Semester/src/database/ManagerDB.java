@@ -31,7 +31,7 @@ public class ManagerDB implements ManagerDBIF {
 
 			
 			String sql = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, "
-					+ "a.address, a.city, a.postalNr " + "FROM Manager m " + "JOIN Person p ON m.managerId = p.id "
+					+ "a.address, a.city, a.postalNr " + "FROM Manager m " + "JOIN Person p ON m.managerId = p.personId "
 					+ "JOIN AddressCityPostal a ON p.addressId = a.addressId " + "WHERE m.managerId = ?";
 
 			stmt = conn.prepareStatement(sql);

@@ -10,7 +10,7 @@ import model.Shift;
 
 public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
-	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (Id, shiftId) VALUES (?, ?)";
+	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employeeId, shiftId) VALUES (?, ?)";
 
 	// gamle kode jeg fjerner.
 //	private PreparedStatement connectShiftToEmployeestmt;
@@ -33,14 +33,14 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	public List<Employee> getAllEmployees() throws DataAccessException {
 		List<Employee> employees = new ArrayList<>();
-		String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.Id = p.id JOIN AddressCityPostal a ON p.addressId = a.addressId";
+		String sql = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId";
 
 		try (Connection con = db.getConnection();
 				PreparedStatement stmt = con.prepareStatement(sql);
 				ResultSet rs = stmt.executeQuery()) {
 
 			while (rs.next()) {
-				Employee e = new Employee(rs.getInt("Id"), rs.getString("firstName"), rs.getString("lastName"),
+				Employee e = new Employee(rs.getInt("employeeId"), rs.getString("firstName"), rs.getString("lastName"),
 						rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
 						rs.getString("email"));
 				employees.add(e);
@@ -129,12 +129,12 @@ public class EmployeeDB implements EmployeeDBIF {
 			db.startTransaction(con);
 
 			// 1) Check om employee findes
-			String employeeSql = "SELECT COUNT(*) FROM Employee WHERE Id = ?";
+			String employeeSql = "SELECT COUNT(*) FROM Employee WHERE employeeId = ?";
 			checkEmployeeStmt = con.prepareStatement(employeeSql);
 			checkEmployeeStmt.setInt(1, employee.getEmployeeId());
 			try (ResultSet rsEmp = checkEmployeeStmt.executeQuery()) {
 				if (rsEmp.next() && rsEmp.getInt(1) == 0) {
-					throw new DataAccessException("Employee does not exist (id=" + employee.getEmployeeId() + ")",
+					throw new DataAccessException("Employee does not exist (employeeId=" + employee.getEmployeeId() + ")",
 							null);
 				}
 			}
@@ -239,7 +239,7 @@ public class EmployeeDB implements EmployeeDBIF {
 			// --- END replacement ---
 
 			// 6) Check om employee allerede er på shift
-			String checkExistingSql = "SELECT COUNT(*) FROM EmployeeShift WHERE Id = ? AND shiftId = ?";
+			String checkExistingSql = "SELECT COUNT(*) FROM EmployeeShift WHERE employeeId = ? AND shiftId = ?";
 			checkExistingStmt = con.prepareStatement(checkExistingSql);
 			checkExistingStmt.setInt(1, employee.getEmployeeId());
 			checkExistingStmt.setInt(2, shift.getShiftId());
@@ -297,9 +297,9 @@ public class EmployeeDB implements EmployeeDBIF {
 	@Override
 	public Employee getEmployeeId(int employeeId) throws DataAccessException {
 		Employee employee = null;
-		String sql = "SELECT e.Id, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr "
-				+ "FROM Employee e " + "JOIN Person p ON e.Id = p.id "
-				+ "JOIN AddressCityPostal a ON p.addressId = a.addressId " + "WHERE e.Id = ?";
+		String sql = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr "
+				+ "FROM Employee e " + "JOIN Person p ON e.employeeId = p.personId "
+				+ "JOIN AddressCityPostal a ON p.addressId = a.addressId " + "WHERE e.employeeId = ?";
 
 		try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -307,14 +307,14 @@ public class EmployeeDB implements EmployeeDBIF {
 
 			try (ResultSet rs = stmt.executeQuery()) {
 				if (rs.next()) {
-					employee = new Employee(rs.getInt("Id"), rs.getString("firstName"), rs.getString("lastName"),
+					employee = new Employee(rs.getInt("employeeId"), rs.getString("firstName"), rs.getString("lastName"),
 							rs.getString("address"), rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
 							rs.getString("email"));
 				}
 			}
 
 		} catch (SQLException e) {
-			throw new DataAccessException("Error loading employee id=" + employeeId, e);
+			throw new DataAccessException("Error loading employee employeeId=" + employeeId, e);
 		}
 
 		return employee;
