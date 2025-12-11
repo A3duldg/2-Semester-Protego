@@ -22,6 +22,7 @@ public class Shift extends AbstractSubject {
 		this.shiftLocation = shiftLocation;
 		this.availability = availability;
 		this.shiftId = shiftId;
+	
 		
 
 		// initialisering af certifications listen & hard coding af brand vagt typen

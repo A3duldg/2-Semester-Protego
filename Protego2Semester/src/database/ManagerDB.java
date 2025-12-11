@@ -57,6 +57,9 @@ public class ManagerDB implements ManagerDBIF {
 					stmt.close();
 			} catch (Exception ignored) {
 			}
+			if (conn != null) {
+	            db.releaseConnection(conn);
+	        }
 		}
 
 		return manager;

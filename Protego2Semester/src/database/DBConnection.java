@@ -97,7 +97,7 @@ public class DBConnection {
 	public void commitTransaction(Connection conn) throws DataAccessException {
 		try {
 			conn.commit();
-			conn.setAutoCommit(false);
+			conn.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataAccessException("Could not commit transaction", e);
 		}
