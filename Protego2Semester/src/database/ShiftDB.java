@@ -13,9 +13,9 @@ public class ShiftDB implements ShiftDBIF {
 
 
 
-	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId FROM Shift WHERE availability = ?";
+	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, shiftDate, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId FROM Shift WHERE availability = ?";
 
-	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (startTime, endTime, guardAmount, shiftLocation, type, availability, contractId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (shiftDate, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET type = ? WHERE shiftId = ?";
 
@@ -41,6 +41,10 @@ public class ShiftDB implements ShiftDBIF {
 				while (rs.next()) {
 					Shift shift = new Shift(rs.getInt("startTime"), rs.getInt("endTime"), rs.getInt("guardAmount"),
 							rs.getString("shiftLocation"), rs.getBoolean("availability"), rs.getInt("shiftId"));
+					Date d = rs.getDate("shiftDate");
+				    if (d != null) {
+				        shift.setShiftDate(d.toLocalDate());
+				    }
 					shift.setShiftType(rs.getString("type"));
 					Integer contractIdObj = null;
                     try {
@@ -70,21 +74,22 @@ public class ShiftDB implements ShiftDBIF {
 
 		try (Connection con = DBConnection.getInstance().getConnection();
 				PreparedStatement stmt = con.prepareStatement(CREATE_SHIFT_Q, Statement.RETURN_GENERATED_KEYS)) {
+			if (shift.getShiftDate() != null) {
+			    stmt.setDate(1, java.sql.Date.valueOf(shift.getShiftDate()));
+			} else {
+			    stmt.setNull(1, java.sql.Types.DATE);
+			}
 
-			stmt.setInt(1, shift.getStartTime());
-			stmt.setInt(2, shift.getEndTime());
-			stmt.setInt(3, shift.getGuardAmount());
-			stmt.setString(4, shift.getShiftLocation());
-			stmt.setString(5, shift.getType());
-			stmt.setBoolean(6, shift.isAvailable());
-			stmt.setInt(7, shift.getContract());
-
-			int cid = shift.getContract();
-	        if (cid > 0) {
-	            stmt.setInt(7, cid);
-	        } else {
-	            stmt.setNull(7, java.sql.Types.INTEGER);
-	        }
+			stmt.setDate(1, java.sql.Date.valueOf(shift.getShiftDate()));
+			stmt.setInt(2, shift.getStartTime()); 
+			stmt.setInt(3, shift.getEndTime());
+			stmt.setInt(4, shift.getGuardAmount()); 
+			stmt.setString(5, shift.getShiftLocation()); 
+			stmt.setString(6, shift.getType()); 
+			stmt.setBoolean(7, shift.isAvailable()); 
+			int cid = shift.getContract(); if (cid > 0) 
+		    stmt.setInt(8, cid); 
+			else stmt.setNull(8, java.sql.Types.INTEGER);
 
 	        int rows = stmt.executeUpdate();
 

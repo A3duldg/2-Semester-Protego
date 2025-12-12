@@ -1,6 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.time.LocalDate;
+
 
 public class Shift extends AbstractSubject {
 
@@ -12,6 +14,8 @@ public class Shift extends AbstractSubject {
 	private boolean availability;
 	private int shiftId;
 	private int contractId;
+	private LocalDate shiftDate;
+
 
 	private ArrayList<String> certifications;
 
@@ -127,5 +131,13 @@ public class Shift extends AbstractSubject {
 		}
 		return false;
 	} 
+	public LocalDate getShiftDate() {
+	    return shiftDate;
+	}
+
+	public void setShiftDate(LocalDate shiftDate) {
+	    this.shiftDate = shiftDate;
+	}
+
 
 }
