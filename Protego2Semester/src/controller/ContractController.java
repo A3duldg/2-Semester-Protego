@@ -41,4 +41,8 @@ public class ContractController {
 	        throw dae;
 	    }
 	}
+	public ArrayList<Contract> getAllActiveContracts() throws DataAccessException {
+	    return new ContractDB().findAllActiveContracts();
+	}
+
 }

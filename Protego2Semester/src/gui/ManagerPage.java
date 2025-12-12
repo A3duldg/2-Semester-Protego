@@ -256,7 +256,7 @@ public class ManagerPage extends JFrame {
             return;
         }
         try {
-            List<Contract> contracts = contractController.getAllContracts();
+        	List<Contract> contracts = contractController.getAllActiveContracts();
             if (contracts == null || contracts.isEmpty()) {
                 combo.addItem(null);
                 combo.setEnabled(false);

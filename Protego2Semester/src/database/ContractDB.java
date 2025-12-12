@@ -16,7 +16,8 @@ public class ContractDB implements ContractDBIF {
 
 	public Contract findContractById(int contractId) throws DataAccessException {
 		Contract contract = null;
-		String sql = "SELECT contractId, guardAmount, startDate, endDate FROM Contract WHERE contractId = ?";
+		String sql =
+			    "SELECT contractId, guardAmount, startDate, endDate FROM Contract, WHERE active = 1, AND (StartDate IS NULL OR StartDate <= CAST(GETDATE() AS date)), AND (EndDate IS NULL OR EndDate >= CAST(GETDATE() AS date))";
 
 		try (Connection con = DBConnection.getInstance().getConnection();
 				PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -184,5 +185,42 @@ public class ContractDB implements ContractDBIF {
 	    }
 	    return list;
 	}
+	//nyt
+	public ArrayList<Contract> findAllActiveContracts() throws DataAccessException {
+	    ArrayList<Contract> list = new ArrayList<>();
 
+	    String sql =
+	        "SELECT contractId, guardAmount, StartDate, EndDate " +
+	        "FROM Contract " +
+	        "WHERE active = 1 " +
+	        "AND (StartDate IS NULL OR StartDate <= CAST(GETDATE() AS date)) " +
+	        "AND (EndDate IS NULL OR EndDate >= CAST(GETDATE() AS date))";
+
+	    try (Connection con = DBConnection.getInstance().getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql);
+	         ResultSet rs = stmt.executeQuery()) {
+
+	        while (rs.next()) {
+	            Integer cid = rs.getObject("contractId", Integer.class);
+	            if (cid == null) continue;
+
+	            Contract c = new Contract(cid);
+
+	            Integer guardAmt = rs.getObject("guardAmount", Integer.class);
+	            if (guardAmt != null) c.setGuardAmount(guardAmt);
+
+	            Date sd = rs.getDate("StartDate");
+	            if (sd != null) c.setStartDate(sd.toLocalDate());
+
+	            Date ed = rs.getDate("EndDate");
+	            if (ed != null) c.setEndDate(ed.toLocalDate());
+
+	            list.add(c);
+	        }
+	    } catch (SQLException e) {
+	        throw new DataAccessException("Error reading active contracts", e);
+	    }
+
+	    return list;
+	}
 	}
