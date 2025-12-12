@@ -11,6 +11,7 @@ IF OBJECT_ID('dbo.Manager', 'U') IS NOT NULL DROP TABLE dbo.Manager;
 IF OBJECT_ID('dbo.Employee', 'U') IS NOT NULL DROP TABLE dbo.Employee;
 IF OBJECT_ID('dbo.Person', 'U') IS NOT NULL DROP TABLE dbo.Person;
 IF OBJECT_ID('dbo.AddressCityPostal', 'U') IS NOT NULL DROP TABLE dbo.AddressCityPostal;
+-- IF (Retunere ID'et for databaseobjekt)(dbo er standard schema i sql, U = vi leder efter objekter af typen user tabel, så en tabel oprettet af brugeren)
 
 -- AddressCityPostal
 CREATE TABLE dbo.AddressCityPostal (

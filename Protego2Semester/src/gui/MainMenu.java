@@ -95,7 +95,7 @@ public class MainMenu extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				ManagerLogin ml = new ManagerLogin();
 				ml.setVisible(true);
-				dispose();
+				
 			}
 		});
 		panelManagerLogin.add(btnManagerLogin);
@@ -114,7 +114,7 @@ public class MainMenu extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				EmployeeLogin el = new EmployeeLogin();
 				el.setVisible(true);
-				dispose();
+			
 			}
 		});
 		panelEmployeeLogin.add(btnEmployeeLogin);
