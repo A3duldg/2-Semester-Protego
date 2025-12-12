@@ -1,7 +1,5 @@
-/model/
 /gui/
+/util/
 /database/
 /test/
-/util/
-/interfaceDB/
-/controller/
+/model/

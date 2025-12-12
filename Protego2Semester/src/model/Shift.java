@@ -25,9 +25,14 @@ public class Shift extends AbstractSubject {
 	
 		
 
-		// initialisering af certifications listen & hard coding af brand vagt typen
+	// initialisering af certifications listen & hard coding af brand vagt typen
 		certifications = new ArrayList<>();
-		certifications.add("Brand Vagt");
+		certifications.add("Brandvagt");
+		certifications.add("Servicevagt");
+		certifications.add("Byggepladsvagt");
+		certifications.add("Dørmand");
+		certifications.add("Fastvagt");
+		certifications.add("Centervagt");
 
 	}
 	
