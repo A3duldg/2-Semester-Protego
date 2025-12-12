@@ -2,39 +2,29 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import interfaceDB.EmployeeDBIF;
 import model.Employee;
 import model.Shift;
-
+// Jeg syntes at det ser fint ud har ikke kunne spotte nogle mærkelige ting selv har kun fjernet en masse gamle kode.
 public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
 	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employeeId, shiftId) VALUES (?, ?)";
 	private static final ConcurrentHashMap<Integer, Object> shiftLocks = new ConcurrentHashMap<>();
 
-	// gamle kode jeg fjerner.
-//	private PreparedStatement connectShiftToEmployeestmt;
-
-	// private Connection con;
-
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
 
 		try {
-			// this.con = DBConnection.getInstance().getConnection();
-
-			// connectShiftToEmployeestmt =
-			// con.prepareStatement(CONNECT_SHIFT_TO_EMPLOYEE_Q);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not intialize EmployeeDB", e);
 		}
 	}
 
-	public List<Employee> getAllEmployees() throws DataAccessException {
-		List<Employee> employees = new ArrayList<>();
+	public ArrayList<Employee> getAllEmployees() throws DataAccessException {
+		ArrayList<Employee> employees = new ArrayList<>();
 		String sql = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId";
 
 		try (Connection con = db.getConnection();
@@ -54,70 +44,6 @@ public class EmployeeDB implements EmployeeDBIF {
 		return employees;
 	}
 
-	/*
-	 * @Override public void connectShiftToEmployee(Employee employee, Shift shift)
-	 * throws DataAccessException { Connection con = db.getConnection();
-	 * PreparedStatement checkEmployeeStmt = null; PreparedStatement checkShiftStmt
-	 * = null; PreparedStatement checkExistingStmt = null; PreparedStatement
-	 * insertStmt = null;
-	 * 
-	 * try { // Start transaktion via DBConnection db.startTransaction(con);
-	 * 
-	 * // Check om employee findes String employeeSql =
-	 * "SELECT COUNT(*) FROM Employee WHERE Id = ?"; checkEmployeeStmt =
-	 * con.prepareStatement(employeeSql); checkEmployeeStmt.setInt(1,
-	 * employee.getEmployeeId()); ResultSet rsEmp =
-	 * checkEmployeeStmt.executeQuery(); if (rsEmp.next() && rsEmp.getInt(1) == 0) {
-	 * throw new IllegalStateException("Employee does not exist"); }
-	 * 
-	 * // Check om shift findes String shiftSql =
-	 * "SELECT COUNT(*) FROM Shift WHERE shiftId = ?"; checkShiftStmt =
-	 * con.prepareStatement(shiftSql); checkShiftStmt.setInt(1, shift.getShiftId());
-	 * ResultSet rsShift = checkShiftStmt.executeQuery(); if (rsShift.next() &&
-	 * rsShift.getInt(1) == 0) { throw new
-	 * IllegalStateException("Shift does not exist"); }
-	 * 
-	 * // Check om employee allerede er på shift String checkExistingSql =
-	 * "SELECT COUNT(*) FROM EmployeeShift WHERE Id = ? AND shiftId = ?";
-	 * checkExistingStmt = con.prepareStatement(checkExistingSql);
-	 * checkExistingStmt.setInt(1, employee.getEmployeeId());
-	 * checkExistingStmt.setInt(2, shift.getShiftId()); ResultSet rsExisting =
-	 * checkExistingStmt.executeQuery(); if (rsExisting.next() &&
-	 * rsExisting.getInt(1) > 0) { throw new
-	 * IllegalStateException("Employee is already assigned to this shift"); }
-	 * 
-	 * // Insert i EmployeeShift insertStmt =
-	 * con.prepareStatement(CONNECT_SHIFT_TO_EMPLOYEE_Q); insertStmt.setInt(1,
-	 * employee.getEmployeeId()); insertStmt.setInt(2, shift.getShiftId()); int rows
-	 * = insertStmt.executeUpdate();
-	 * 
-	 * if (rows == 0) { throw new SQLException("Insert failed: no rows affected"); }
-	 * 
-	 * // Commit transaktion db.commitTransaction(con);
-	 * 
-	 * System.out.println("Shift assigned successfully: employeeId=" +
-	 * employee.getEmployeeId() + ", shiftId=" + shift.getShiftId());
-	 * 
-	 * } catch (Exception e) { // Rollback ved fejl db.rollbackTransaction(con);
-	 * throw new DataAccessException("Error connecting shift to employee", e);
-	 * 
-	 * } finally { // Oprydning af ressourcer db.releaseConnection(con);
-	 * 
-	 * try { if (checkEmployeeStmt != null) checkEmployeeStmt.close(); if
-	 * (checkShiftStmt != null) checkShiftStmt.close(); if (checkExistingStmt !=
-	 * null) checkExistingStmt.close(); if (insertStmt != null) insertStmt.close();
-	 * // Connection håndteres af DBConnection vi lukker ikke her } catch
-	 * (SQLException e) { e.printStackTrace(); } } }
-	 * 
-	 * @SuppressWarnings("unused") private Employee buildObject(ResultSet rs) throws
-	 * SQLException { Employee employee = new Employee(rs.getInt("Id"),
-	 * rs.getString("firstName"), rs.getString("lastName"), rs.getString("address"),
-	 * rs.getString("city"), rs.getInt("postalNr"), rs.getString("phone"),
-	 * rs.getString("email"));
-	 * 
-	 * return employee; }
-	 */
-
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
 		// we get or create a lock for this shift
@@ -134,9 +60,14 @@ public class EmployeeDB implements EmployeeDBIF {
 		// at the same time
 		synchronized (lock) {
 			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
-			//----------------- IMPORTANT! ---------------------------
-			//Here we do a thread sleep to make blocking more visible. We should comment the line below when we dont want to test
-			try { Thread.sleep(2000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
+			// ----------------- IMPORTANT! ---------------------------
+			// Here we do a thread sleep to make blocking more visible. We should comment
+			// the line below when we dont want to test
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException ignored) {
+				Thread.currentThread().interrupt();
+			}
 
 			try {
 				con = db.getConnection();
@@ -301,11 +232,11 @@ public class EmployeeDB implements EmployeeDBIF {
 
 				if (con != null)
 					db.releaseConnection(con);
-				
+
 				// Here we release the lock
-				 util.LockRegistry.release(shiftId);
+				util.LockRegistry.release(shiftId);
 			}
-		} 
+		}
 	}
 
 	@Override

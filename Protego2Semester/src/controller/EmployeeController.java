@@ -1,5 +1,4 @@
 package controller;
-import java.util.List;
 import java.util.ArrayList;
 import database.DataAccessException;
 import interfaceDB.EmployeeDBIF;
@@ -28,7 +27,7 @@ public class EmployeeController {
 
 
 	}
-	 public List<Employee> getAllEmployees() {
+	 public ArrayList<Employee> getAllEmployees() {
 	        try {
 	            return employeeDB.getAllEmployees();
 	        } catch (DataAccessException e) {
@@ -37,7 +36,7 @@ public class EmployeeController {
 	        }
 	    }
 	 public void attachAllEmployeesToShift(Shift shift) {
-	        List<Employee> allEmployees = getAllEmployees();
+	        ArrayList<Employee> allEmployees = getAllEmployees();
 	        if (allEmployees != null) {
 	            for (Employee e : allEmployees) {
 	                shift.attachObserver(e); // Employee implementerer Observer

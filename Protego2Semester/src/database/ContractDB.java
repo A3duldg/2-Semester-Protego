@@ -2,7 +2,6 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import interfaceDB.ContractDBIF;
 import model.Contract;
@@ -152,8 +151,8 @@ public class ContractDB implements ContractDBIF {
 	        return contract;
 	    }
 	
-	public List<Contract> findAllContracts() throws DataAccessException {
-	    List<Contract> list = new ArrayList<>();
+	public ArrayList<Contract> findAllContracts() throws DataAccessException {
+	    ArrayList<Contract> list = new ArrayList<>();
 	    String sql = "SELECT contractId, guardAmount, StartDate, EndDate FROM Contract";
 
 	    try (Connection con = DBConnection.getInstance().getConnection();

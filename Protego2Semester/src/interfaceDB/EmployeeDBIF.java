@@ -1,7 +1,8 @@
 package interfaceDB;
 
 import database.DataAccessException;
-import java.util.List;
+
+import java.util.ArrayList;
 import model.Employee;
 import model.Shift;
 
@@ -15,5 +16,5 @@ public interface EmployeeDBIF {
         return getEmployeeId(employeeId); // nu sletter jeg den ikke men der er noget her der skal fixes for det er et interface så der skal slet ikke være return typer osv.
     }
 
-    List<Employee> getAllEmployees() throws DataAccessException;
+    ArrayList<Employee> getAllEmployees() throws DataAccessException;
 }
