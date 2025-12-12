@@ -1,7 +1,6 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Employee implements Observer {
 	private int employeeId;
@@ -13,10 +12,8 @@ public class Employee implements Observer {
 	private String phone;
 	private String email;
 	private ArrayList<Shift> shifts = new ArrayList<>();
-	private List<Shift> relevantShifts = new ArrayList<>();
-	private List<Shift> observedShifts = new ArrayList<>();
-
-
+	private ArrayList<Shift> relevantShifts = new ArrayList<>();
+	private ArrayList<Shift> observedShifts = new ArrayList<>();
 
 	public Employee(int employeeId, String firstName, String lastName, String adress, String city, int postalNr,
 			String phone, String email) {
@@ -109,17 +106,17 @@ public class Employee implements Observer {
 		relevantShifts();
 
 	}
+
 	public void attachShift(Shift shift) {
-	    shift.attachObserver(this);   // Shift er Subject
-	    observedShifts.add(shift);
+		shift.attachObserver(this); // Shift er Subject
+		observedShifts.add(shift);
 	}
 
-
 	private void relevantShifts() {
-	    relevantShifts.clear();
-	    for (Shift s : observedShifts) {
-	        relevantShifts.add(s);
-	    }
+		relevantShifts.clear();
+		for (Shift s : observedShifts) {
+			relevantShifts.add(s);
+		}
 	}
 
 }
