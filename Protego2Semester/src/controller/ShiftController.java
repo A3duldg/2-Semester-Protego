@@ -7,7 +7,6 @@ import model.Shift;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import database.DataAccessException;
 import database.ShiftDB;
@@ -18,7 +17,7 @@ public class ShiftController {
 	private ShiftDBIF shiftDB;
 
 	// Tråd sikker liste til vagter der er under behandling
-	private final List<Shift> processingShifts;
+	private final ArrayList<Shift> processingShifts;
 	private final Object shiftLock = new Object();
 
 	// Tråd sikker tæller
@@ -101,15 +100,15 @@ public class ShiftController {
 	    }
 
 
-	public List<Shift> findShiftByAvailability(boolean availability) throws DataAccessException {
+	public ArrayList<Shift> findShiftByAvailability(boolean availability) throws DataAccessException {
 	        return shiftDB.findShiftByAvailability(availability);
 	   
 	 
 	}
 
 
-	public List<Shift> findAvailableShifts(List<Shift> allShifts) {
-		List<Shift> available = new ArrayList<>();
+	public ArrayList<Shift> findAvailableShifts(ArrayList<Shift> allShifts) {
+		ArrayList<Shift> available = new ArrayList<>();
 
 		// Implementering Lambda for hver vagt, tjek om den er ledig
 		allShifts.forEach(shift -> {
@@ -121,8 +120,8 @@ public class ShiftController {
 		return available;
 	}
 
-	public List<Shift> sortShiftsByStartTime(List<Shift> shifts) {
-		List<Shift> sorted = new ArrayList<>(shifts);
+	public ArrayList<Shift> sortShiftsByStartTime(ArrayList<Shift> shifts) {
+		ArrayList<Shift> sorted = new ArrayList<>(shifts);
 
 		// Implementing af en funktion som skal sortere vagter udfra starttider
 		sorted.sort((shift1, shift2) -> Integer.compare(shift1.getStartTime(), shift2.getStartTime()));
@@ -130,7 +129,7 @@ public class ShiftController {
 		return sorted;
 	}
 
-	public int calculateTotalHours(List<Shift> shifts) {
+	public int calculateTotalHours(ArrayList<Shift> shifts) {
 		int totalHours = 0;
 
 		// Implementering af en Lambda der beregner timerne for hver vagt
@@ -167,7 +166,7 @@ public class ShiftController {
 	}
 
 	// Producer consumer der opretter flere vagter og ligger dem ud
-	public void bulkShiftCreation(List<Shift> shifts) {
+	public void bulkShiftCreation(ArrayList<Shift> shifts) {
 		System.out.println("Starter oprettelse af " + shifts.size() + "vagter");
 
 		// Producer som tilføjer flere vagter til en liste

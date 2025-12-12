@@ -126,6 +126,6 @@ public class Shift extends AbstractSubject {
 			return true;
 		}
 		return false;
-	}
+	} 
 
 }

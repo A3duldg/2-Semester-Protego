@@ -1,7 +1,7 @@
 package interfaceDB;
 
 
-import java.util.List;
+import java.util.ArrayList;
 
 import database.DataAccessException;
 import model.Shift;
@@ -9,7 +9,7 @@ import model.Shift;
 public interface ShiftDBIF {
 
 
-List<Shift> findShiftByAvailability(boolean Availability)throws DataAccessException;
+ArrayList<Shift> findShiftByAvailability(boolean Availability)throws DataAccessException;
 
 int createShift(Shift shift)throws DataAccessException;
 

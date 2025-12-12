@@ -2,7 +2,6 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import interfaceDB.ShiftDBIF;
 import model.Shift;
@@ -20,7 +19,7 @@ public class ShiftDB implements ShiftDBIF {
 
 	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET type = ? WHERE shiftId = ?";
 
-	private static final String BOOK_SHIFT_Q = "UPDATE Shift SET availability = 0 WHERE shiftId = ?";
+
 
 	public ShiftDB() throws DataAccessException {
 
@@ -30,8 +29,8 @@ public class ShiftDB implements ShiftDBIF {
 
 
 	@Override
-	public List<Shift> findShiftByAvailability(boolean availability) throws DataAccessException {
-		List<Shift> list = new ArrayList<>();
+	public ArrayList<Shift> findShiftByAvailability(boolean availability) throws DataAccessException {
+		ArrayList<Shift> list = new ArrayList<>();
 
 		try (Connection con = DBConnection.getInstance().getConnection();
 				PreparedStatement stmt = con.prepareStatement(FIND_SHIFT_BY_AVAILABILITY_Q)) {
