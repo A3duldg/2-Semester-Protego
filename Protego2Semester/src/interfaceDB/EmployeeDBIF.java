@@ -11,8 +11,8 @@ public interface EmployeeDBIF {
 
     Employee getEmployeeId(int employeeId) throws DataAccessException;
 
-    default Employee findActiveEmployee(int employeeId) throws DataAccessException {
-        return getEmployeeId(employeeId);
+    default Employee findActiveEmployee(int employeeId) throws DataAccessException { //findActiveEmployee den her forstår jeg ikke helt hvorfor der er her.
+        return getEmployeeId(employeeId); // nu sletter jeg den ikke men der er noget her der skal fixes for det er et interface så der skal slet ikke være return typer osv.
     }
 
     List<Employee> getAllEmployees() throws DataAccessException;
