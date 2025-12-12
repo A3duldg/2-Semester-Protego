@@ -133,6 +133,10 @@ public class EmployeeDB implements EmployeeDBIF {
 		// We synchronize so only one thread can perform check and insert for the shift
 		// at the same time
 		synchronized (lock) {
+			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
+			//----------------- IMPORTANT! ---------------------------
+			//Here we do a thread sleep to make blocking more visible. We should comment the line below when we dont want to test
+			try { Thread.sleep(2000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
 
 			try {
 				con = db.getConnection();

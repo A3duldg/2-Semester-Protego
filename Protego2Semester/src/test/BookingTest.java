@@ -14,7 +14,7 @@ public class BookingTest {
     public static void main(String[] args) throws Exception {
         //  Configure before run
         final int[] employeeIds = { 3 , 4 }; 
-        final int shiftId = 6;
+        final int shiftId = 7;
         // ----------------------------------
 
         final int threads = employeeIds.length;
@@ -52,12 +52,21 @@ public class BookingTest {
                         System.out.println("Thread emp " + empId + ": Employee not found in DB - aborting");
                         return;
                     }
-
-                    System.out.println("Thread emp " + empId + " attempting booking...");
-                    employeeController.connectShiftToEmployee(emp, shift);
-                    System.out.println("SUCCESS: employee " + empId + " booked shift " + shiftId);
-                } catch (DataAccessException dae) {
-                    System.out.println("FAIL: employee " + empId + " => " + dae.getMessage());
+                    final String tname = Thread.currentThread().getName() + "-emp" + empId;
+                    
+                    System.out.println("[" + tname + "] attempting booking at " + System.currentTimeMillis());
+                    long t0 = System.nanoTime();
+                    try {
+                    	employeeController.connectShiftToEmployee(emp, shift);
+                        long tookMs = (System.nanoTime() - t0) / 1_000_000;
+                        System.out.println("[" + tname + "] SUCCESS booked shift " + shiftId + " (took " + tookMs + " ms)");
+                        if (tookMs > 200) {
+                            System.out.println("[" + tname + "] NOTE: long wait detected (likely blocked on lock)");
+                        }
+                    } catch (DataAccessException dae) {
+                        long tookMs = (System.nanoTime() - t0) / 1_000_000;
+                        System.out.println("[" + tname + "] FAIL booking: " + dae.getMessage() + " (took " + tookMs + " ms)");
+                    }
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     System.out.println("Interrupted: emp " + empId);
