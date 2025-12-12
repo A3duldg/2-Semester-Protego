@@ -55,6 +55,10 @@ public class ShiftDB implements ShiftDBIF {
 			}
 		} catch (SQLException e) {
 			throw new DataAccessException("Error finding shifts", e);
+		} finally {
+			if (con !=null) {
+				db.releaseConnection(con);
+			}
 		}
 
 		return list;
@@ -95,6 +99,10 @@ public class ShiftDB implements ShiftDBIF {
 	    } catch (SQLException | DataAccessException e) {
 	        // log fejlen (evt. vis venlig besked i UI)
 	        e.printStackTrace();
+	    } finally {
+	    	if (con !=null) {
+	    		db.releaseConnection(con);
+	    	}
 	    }
 	    return newId;
 	}
