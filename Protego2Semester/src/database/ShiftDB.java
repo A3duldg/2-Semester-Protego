@@ -24,7 +24,7 @@ public class ShiftDB implements ShiftDBIF {
 	public ShiftDB() throws DataAccessException {
 
 		db = DBConnection.getInstance();
-//aasdasdaasd
+
 	}
 
 
