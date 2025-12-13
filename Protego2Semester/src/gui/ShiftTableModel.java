@@ -17,7 +17,7 @@ import model.Shift;
 
 public class ShiftTableModel extends AbstractTableModel {
 	private List<Shift> data;
-	private static final String[] COL_NAMES = { "ID", "Date", "Start", "End", "Guards", "Location", "Type", "Available",
+	private static final String[] COL_NAMES = { "ID", "Start", "End", "Guards", "Location", "Type", "Available",
 			"Staffing" };
 
 	private final ContractController contractController;
@@ -133,57 +133,56 @@ public class ShiftTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int row, int column) {
-	    Shift s = data.get(row);
+		Shift s = data.get(row);
+		// Debugging
+		System.out.println("Shift ID: " + s.getShiftId() + ", Contract ID: " + s.getContract());
 
-	    switch (column) {
-	        case 0:
-	            return s.getShiftId();
+		switch (column) {
 
-	        case 1:
-	            return s.getShiftDate(); // 👈 DEN NYE
+		case 0:
+			return s.getShiftId();
+		case 1:
+			return s.getStartTime();
+		case 2:
+			return s.getEndTime();
+		case 3:
+			return s.getGuardAmount();
+		case 4:
+			return s.getShiftLocation();
+		case 5:
+			return s.getType();
+		case 6:
+			return s.isAvailable() ? "Yes" : "No";
+		case 7: {
+		    int shiftId = s.getShiftId();
+		    int contractId = s.getContract();
 
-	        case 2:
-	            return s.getStartTime();
+		    Integer bookedObj;
+		    synchronized (bookedByShiftId) {
+		        bookedObj = bookedByShiftId.get(shiftId);
+		    }
+		    if (bookedObj == null) {
+		        return "Loading..."; // prefetch ikke færdig endnu
+		    }
+		    if (bookedObj < 0) {
+		        return "Error";
+		    }
+		    int booked = bookedObj;
 
-	        case 3:
-	            return s.getEndTime();
+		    Integer needed = null;
+		    if (contractId > 0) {
+		        synchronized (contractById) {
+		            Contract c = contractById.get(contractId);
+		            if (c != null) needed = c.getGuardAmount();
+		        }
+		    }
+		    int neededInt = (needed != null && needed > 0) ? needed : s.getGuardAmount();
 
-	        case 4:
-	            return s.getGuardAmount();
+		    return booked + " / " + neededInt;
+		}
 
-	        case 5:
-	            return s.getShiftLocation();
-
-	        case 6:
-	            return s.getType();
-
-	        case 7:
-	            return s.isAvailable() ? "Yes" : "No";
-
-	        case 8: { // 👈 STAFFING ER NU CASE 8
-	            int shiftId = s.getShiftId();
-	            int contractId = s.getContract();
-
-	            Integer booked;
-	            synchronized (bookedByShiftId) {
-	                booked = bookedByShiftId.get(shiftId);
-	            }
-	            if (booked == null) return "Loading...";
-	            if (booked < 0) return "Error";
-
-	            Integer needed = null;
-	            if (contractId > 0) {
-	                synchronized (contractById) {
-	                    Contract c = contractById.get(contractId);
-	                    if (c != null) needed = c.getGuardAmount();
-	                }
-	            }
-	            int neededInt = (needed != null && needed > 0) ? needed : s.getGuardAmount();
-	            return booked + " / " + neededInt;
-	        }
-
-	        default:
-	            return "UNKNOWN COL";
-	    }
-	}
+        default:
+            return "UNKNOWN COL";
+        }
+    }
 }
