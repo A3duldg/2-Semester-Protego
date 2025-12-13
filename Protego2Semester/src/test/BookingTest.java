@@ -14,7 +14,7 @@ public class BookingTest {
     public static void main(String[] args) throws Exception {
         //  Configure before run
         final int[] employeeIds = { 3 , 4 }; 
-        final int shiftId = 7;
+        final int shiftId = 20;
         // ----------------------------------
 
         final int threads = employeeIds.length;
@@ -60,9 +60,7 @@ public class BookingTest {
                     	employeeController.connectShiftToEmployee(emp, shift);
                         long tookMs = (System.nanoTime() - t0) / 1_000_000;
                         System.out.println("[" + tname + "] SUCCESS booked shift " + shiftId + " (took " + tookMs + " ms)");
-                        if (tookMs > 200) {
-                            System.out.println("[" + tname + "] NOTE: long wait detected (likely blocked on lock)");
-                        }
+                  
                     } catch (DataAccessException dae) {
                         long tookMs = (System.nanoTime() - t0) / 1_000_000;
                         System.out.println("[" + tname + "] FAIL booking: " + dae.getMessage() + " (took " + tookMs + " ms)");

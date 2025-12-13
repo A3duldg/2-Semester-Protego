@@ -48,7 +48,7 @@ public class EmployeeDB implements EmployeeDBIF {
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
 		// we get or create a lock for this shift
 		final int shiftId = shift.getShiftId();
-		final Object lock = util.LockRegistry.acquire(shiftId);
+	
 
 		Connection con = null;
 		PreparedStatement checkEmployeeStmt = null;
@@ -58,7 +58,9 @@ public class EmployeeDB implements EmployeeDBIF {
 
 		// We synchronize so only one thread can perform check and insert for the shift
 		// at the same time
-		synchronized (lock) {
+		System.out.println("[" + Thread.currentThread().getName() + "] waiting to enter booking section");
+		synchronized (this) {
+			// kritisk sektion
 			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
 			// ----------------- IMPORTANT! ---------------------------
 			// Here we do a thread sleep to make blocking more visible. We should comment
@@ -233,8 +235,6 @@ public class EmployeeDB implements EmployeeDBIF {
 				if (con != null)
 					db.releaseConnection(con);
 
-				// Here we release the lock
-				util.LockRegistry.release(shiftId);
 			}
 		}
 	}
