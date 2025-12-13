@@ -77,6 +77,7 @@ CREATE TABLE dbo.Certified (
 -- Shift
 CREATE TABLE dbo.Shift (
     shiftId INT IDENTITY(1,1) PRIMARY KEY,
+    shiftDate DATE NOTT NULL,
     startTime INT NOT NULL,     -- eks. 800
     endTime INT NOT NULL,       -- eks. 1600
     guardAmount INT NOT NULL,   
