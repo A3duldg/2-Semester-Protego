@@ -8,6 +8,8 @@ import java.sql.*;
 public class ManagerDB implements ManagerDBIF {
 
 	private final DBConnection db;
+	
+	private static final String FIND_MANAGER_BY_ID = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Manager m JOIN Person p ON m.managerId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE m.managerId = ?";
 
 	public ManagerDB() throws DataAccessException {
 		db = DBConnection.getInstance();
@@ -29,10 +31,7 @@ public class ManagerDB implements ManagerDBIF {
 		try {
 			conn = db.getConnection();
 
-			
-			String sql = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Manager m JOIN Person p ON m.managerId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE m.managerId = ?";
-
-			stmt = conn.prepareStatement(sql);
+			stmt = conn.prepareStatement(FIND_MANAGER_BY_ID);
 			stmt.setInt(1, managerId);
 			rs = stmt.executeQuery();
 

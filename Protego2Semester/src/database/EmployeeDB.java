@@ -2,7 +2,7 @@ package database;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 import interfaceDB.EmployeeDBIF;
 import model.Employee;
@@ -11,7 +11,23 @@ import model.Shift;
 public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
 	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employeeId, shiftId) VALUES (?, ?)";
-	private static final ConcurrentHashMap<Integer, Object> shiftLocks = new ConcurrentHashMap<>();
+	
+	private static final String GET_ALL_EMPLOYEE_Q = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId";
+	
+	private static final String CHECK_EMPLOYEE_EXISTS_Q = "SELECT COUNT(*) FROM Employee WHERE employeeId = ?";
+	
+	private static final String GET_SHIFT_INFO_Q = "SELECT availability, contractId FROM Shift WHERE shiftId = ?";
+	
+	private static final String COUNT_EMPLOYEES_FOR_SHIFTS_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
+	
+	private static final String GET_SHIFT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
+	
+	private static final String GET_CONTRACT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
+	
+	private static final String CHECK_EMPLOYEE_ALREADY_ASSIGNED_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE employeeId = ? AND shiftId = ?";
+	
+	private static final String GET_EMPLOYEE_BY_ID_Q = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e " + "JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.employeeId = ?";
+	
 
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
@@ -25,10 +41,9 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	public ArrayList<Employee> getAllEmployees() throws DataAccessException {
 		ArrayList<Employee> employees = new ArrayList<>();
-		String sql = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId";
 
 		try (Connection con = db.getConnection();
-				PreparedStatement stmt = con.prepareStatement(sql);
+				PreparedStatement stmt = con.prepareStatement(GET_ALL_EMPLOYEE_Q);
 				ResultSet rs = stmt.executeQuery()) {
 
 			while (rs.next()) {
@@ -76,8 +91,8 @@ public class EmployeeDB implements EmployeeDBIF {
 				db.startTransaction(con);
 
 				// 1) Check om employee findes
-				String employeeSql = "SELECT COUNT(*) FROM Employee WHERE employeeId = ?";
-				checkEmployeeStmt = con.prepareStatement(employeeSql);
+				
+				checkEmployeeStmt = con.prepareStatement(CHECK_EMPLOYEE_EXISTS_Q);
 				checkEmployeeStmt.setInt(1, employee.getEmployeeId());
 				try (ResultSet rsEmp = checkEmployeeStmt.executeQuery()) {
 					if (rsEmp.next() && rsEmp.getInt(1) == 0) {
@@ -87,8 +102,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				}
 
 				// 2) Check om shift findes OG hent contractId + availability for shift
-				String shiftSql = "SELECT availability, contractId FROM Shift WHERE shiftId = ?";
-				checkShiftStmt = con.prepareStatement(shiftSql);
+				checkShiftStmt = con.prepareStatement(GET_SHIFT_INFO_Q);
 				checkShiftStmt.setInt(1, shift.getShiftId());
 				Boolean availability = null;
 				Integer contractId = null;
@@ -109,8 +123,7 @@ public class EmployeeDB implements EmployeeDBIF {
 
 				// 4) Tæl bookede employees for DENNE SHIFT
 				int bookedForThisShift = 0;
-				String countShiftSql = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
-				try (PreparedStatement countShiftStmt = con.prepareStatement(countShiftSql)) {
+				try (PreparedStatement countShiftStmt = con.prepareStatement(COUNT_EMPLOYEES_FOR_SHIFTS_Q)) {
 					countShiftStmt.setInt(1, shift.getShiftId());
 					try (ResultSet rs = countShiftStmt.executeQuery()) {
 						if (rs.next())
@@ -123,8 +136,7 @@ public class EmployeeDB implements EmployeeDBIF {
 //	         - ellers fallback til Shift.guardAmount hvis den findes i DB
 				int contractGuardLimit = -1;
 				if (contractId != null && contractId > 0) {
-					String guardSql = "SELECT guardAmount FROM Contract WHERE contractId = ?";
-					try (PreparedStatement guardStmt = con.prepareStatement(guardSql)) {
+					try (PreparedStatement guardStmt = con.prepareStatement(GET_CONTRACT_GUARD_AMOUNT_Q)) {
 						guardStmt.setInt(1, contractId);
 						try (ResultSet rsG = guardStmt.executeQuery()) {
 							if (rsG.next()) {
@@ -150,8 +162,7 @@ public class EmployeeDB implements EmployeeDBIF {
 					effectiveLimit = contractGuardLimit;
 				} else {
 					Integer shiftGuardObj = null;
-					String shiftGuardSql = "SELECT guardAmount FROM Shift WHERE shiftId = ?";
-					try (PreparedStatement shiftGuardStmt = con.prepareStatement(shiftGuardSql)) {
+					try (PreparedStatement shiftGuardStmt = con.prepareStatement(GET_SHIFT_GUARD_AMOUNT_Q)) {
 						shiftGuardStmt.setInt(1, shift.getShiftId());
 						try (ResultSet rsS = shiftGuardStmt.executeQuery()) {
 							if (rsS.next()) {
@@ -181,8 +192,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				}
 
 				// 7) Check om employee allerede er på shift
-				String checkExistingSql = "SELECT COUNT(*) FROM EmployeeShift WHERE employeeId = ? AND shiftId = ?";
-				checkExistingStmt = con.prepareStatement(checkExistingSql);
+				checkExistingStmt = con.prepareStatement(CHECK_EMPLOYEE_ALREADY_ASSIGNED_Q);
 				checkExistingStmt.setInt(1, employee.getEmployeeId());
 				checkExistingStmt.setInt(2, shift.getShiftId());
 				try (ResultSet rsExisting = checkExistingStmt.executeQuery()) {
@@ -242,11 +252,8 @@ public class EmployeeDB implements EmployeeDBIF {
 	@Override
 	public Employee getEmployeeId(int employeeId) throws DataAccessException {
 		Employee employee = null;
-		String sql = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr "
-				+ "FROM Employee e " + "JOIN Person p ON e.employeeId = p.personId "
-				+ "JOIN AddressCityPostal a ON p.addressId = a.addressId " + "WHERE e.employeeId = ?";
 
-		try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+		try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(GET_EMPLOYEE_BY_ID_Q)) {
 
 			stmt.setInt(1, employeeId);
 

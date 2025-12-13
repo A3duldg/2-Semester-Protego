@@ -11,15 +11,15 @@ public class ShiftDB implements ShiftDBIF {
 	private Connection con;
 	private final DBConnection db;
 
-
-
 	private static final String FIND_SHIFT_BY_AVAILABILITY_Q = "SELECT shiftId, shiftDate, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId FROM Shift WHERE availability = ?";
 
 	private static final String CREATE_SHIFT_Q = "INSERT INTO Shift (shiftDate, startTime, endTime, guardAmount, shiftLocation, type, availability, contractId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String SET_SHIFT_TYPE_Q = "UPDATE Shift SET type = ? WHERE shiftId = ?";
 
-
+	private static final String BOOK_SHIFT_Q = "UPDATE Shift SET availability = 0 WHERE shiftId = ?";
+	
+	private static final String COUNT_EMPLOYEES_FOR_SHIFT_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
 
 	public ShiftDB() throws DataAccessException {
 
@@ -116,7 +116,7 @@ public class ShiftDB implements ShiftDBIF {
 	public boolean setShiftType(Shift shift) {
 		boolean result = false;
 		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement stmt = con.prepareStatement("UPDATE Shift SET type = ? WHERE shiftId = ?")) {
+				PreparedStatement stmt = con.prepareStatement(SET_SHIFT_TYPE_Q)) {
 
 			stmt.setString(1, shift.getType());
 			stmt.setInt(2, shift.getShiftId());
@@ -135,7 +135,7 @@ public class ShiftDB implements ShiftDBIF {
 		boolean result = false;
 
 		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement stmt = con.prepareStatement("UPDATE Shift SET availability = 0 WHERE shiftId = ?")) {
+				PreparedStatement stmt = con.prepareStatement(BOOK_SHIFT_Q)) {
 
 			stmt.setInt(1, shift.getShiftId());
 
@@ -152,9 +152,8 @@ public class ShiftDB implements ShiftDBIF {
 	}
 	
 	public int countEmployeesForShift(int shiftId) throws DataAccessException {
-	    String sql = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
 	    try (Connection con = DBConnection.getInstance().getConnection();
-	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	         PreparedStatement stmt = con.prepareStatement(COUNT_EMPLOYEES_FOR_SHIFT_Q)) {
 	        stmt.setInt(1, shiftId);
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            if (rs.next()) {

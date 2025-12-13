@@ -5,7 +5,7 @@ import model.Contract;
 import model.Manager;
 import model.Shift;
 
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 
 import database.DataAccessException;
