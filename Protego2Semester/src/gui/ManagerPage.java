@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.EventQueue;
 
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -34,6 +35,10 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class ManagerPage extends JFrame {
 
@@ -138,12 +143,14 @@ public class ManagerPage extends JFrame {
 	}
 	
 	private void openNewShiftDialog() {
+		JTextField txtShiftDate = new JTextField();
         JTextField txtStartTime = new JTextField();
         JTextField txtEndTime = new JTextField();
         JTextField txtGuardAmount = new JTextField();
         JTextField txtLocation = new JTextField();
         JTextField txtType = new JTextField();
         JCheckBox chkAvailable = new JCheckBox("Available", true);
+        
 
         // Contract combo
         JComboBox<Contract> contractCombo = new JComboBox<>();
@@ -168,6 +175,8 @@ public class ManagerPage extends JFrame {
         loadContractsIntoCombo(contractCombo);
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
+        panel.add(new JLabel("Shift Date (dd/MM-yyyy):"));
+        panel.add(txtShiftDate);
         panel.add(new JLabel("Start Time:"));
         panel.add(txtStartTime);
         panel.add(new JLabel("End Time:"));
@@ -215,9 +224,42 @@ public class ManagerPage extends JFrame {
                     JOptionPane.showMessageDialog(this, "Database error while validating contract: " + dae.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
+                String raw = txtShiftDate.getText().trim().replace('-', '/');
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+                LocalDate shiftDate;
+                try {
+                    shiftDate = LocalDate.parse(raw, fmt);
+                } catch (DateTimeParseException dte) {
+                    JOptionPane.showMessageDialog(this,
+                        "Dato skal være dd/MM-yyyy, fx 14/12-2025",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                LocalDate cs = selectedContract.getStartDate();
+                LocalDate ce = selectedContract.getEndDate();
+
+                if (cs != null && shiftDate.isBefore(cs)) {
+                    JOptionPane.showMessageDialog(this,
+                        "Shift-dato er før kontraktens start: " + cs,
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                if (ce != null && shiftDate.isAfter(ce)) {
+                    JOptionPane.showMessageDialog(this,
+                        "Shift-dato er efter kontraktens slut: " + ce,
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
 
                 // Build and persist shift
                 Shift newShift = new Shift(start, end, guards, location, available, -1);
+                newShift.setShiftDate(shiftDate);
                 newShift.setShiftType(type);
                 newShift.setContractId(contractIdForInsert);
 

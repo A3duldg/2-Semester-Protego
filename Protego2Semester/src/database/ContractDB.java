@@ -15,47 +15,38 @@ public class ContractDB implements ContractDBIF {
 	}
 
 	public Contract findContractById(int contractId) throws DataAccessException {
-		Contract contract = null;
-		String sql =
-			    "SELECT contractId, guardAmount, startDate, endDate FROM Contract, WHERE active = 1, AND (StartDate IS NULL OR StartDate <= CAST(GETDATE() AS date)), AND (EndDate IS NULL OR EndDate >= CAST(GETDATE() AS date))";
+	    Contract contract = null;
+	    String sql = "SELECT contractId, guardAmount, startDate, endDate, active, confirmed " +
+	                 "FROM Contract WHERE contractId = ?";
 
-		try (Connection con = DBConnection.getInstance().getConnection();
-				PreparedStatement stmt = con.prepareStatement(sql)) {
+	    try (Connection con = DBConnection.getInstance().getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
 
-			stmt.setInt(1, contractId);
+	        stmt.setInt(1, contractId);
 
-			try (ResultSet rs = stmt.executeQuery()) {
-				if (rs.next()) {
-					Integer cid = rs.getObject("contractId", Integer.class);
-					if (cid == null) {
-						// Usædvanligt: fundet en række uden contractId
-						System.err.println("findContractById: contractId var NULL for søgning på id=" + contractId);
-						return null;
-					}
-					contract = new Contract(cid);
-					
-					Integer guardAmt = rs.getObject("guardAmount", Integer.class);
-	                if (guardAmt != null) {
-	                    contract.setGuardAmount(guardAmt);
-	                }
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                contract = new Contract(rs.getInt("contractId"));
+	                contract.setGuardAmount(rs.getInt("guardAmount"));
 
-					Date sd = rs.getDate("startDate");
-					if (sd != null)
-						contract.setStartDate(sd.toLocalDate());
+	                Date sd = rs.getDate("startDate");
+	                if (sd != null) contract.setStartDate(sd.toLocalDate());
 
-					Date ed = rs.getDate("endDate");
-					if (ed != null)
-						contract.setEndDate(ed.toLocalDate());
-				}
-			}
-		} catch (SQLException e) {
-		    // Print fuld JDBC-fejl til konsol for at finde root-cause, så vi kan fixe den præcist.
+	                Date ed = rs.getDate("endDate");
+	                if (ed != null) contract.setEndDate(ed.toLocalDate());
+
+	                contract.setActive(rs.getBoolean("active"));
+	                contract.setConfirmed(rs.getBoolean("confirmed"));
+	            }
+	        }
+	    } catch (SQLException e) {
+	        // Print fuld JDBC-fejl til konsol for at finde root-cause, så vi kan fixe den præcist.
 		    System.err.println("ContractDB.findContractById: SQLException: " + e.getMessage());
 		    e.printStackTrace(System.err);
-		    throw new DataAccessException("Error finding contract", e);
-		}
-
-		return contract;
+	        throw new DataAccessException("Error finding contract", e);
+	    }
+	    return contract;
+	
 	}
 
 	@Override
@@ -190,11 +181,11 @@ public class ContractDB implements ContractDBIF {
 	    ArrayList<Contract> list = new ArrayList<>();
 
 	    String sql =
-	        "SELECT contractId, guardAmount, StartDate, EndDate " +
-	        "FROM Contract " +
-	        "WHERE active = 1 " +
-	        "AND (StartDate IS NULL OR StartDate <= CAST(GETDATE() AS date)) " +
-	        "AND (EndDate IS NULL OR EndDate >= CAST(GETDATE() AS date))";
+	    	    "SELECT contractId, guardAmount, startDate, endDate " +
+	    	    "FROM Contract " +
+	    	    "WHERE active = 1 " +
+	    	    "AND (endDate IS NULL OR endDate >= CAST(GETDATE() AS date))";
+
 
 	    try (Connection con = DBConnection.getInstance().getConnection();
 	         PreparedStatement stmt = con.prepareStatement(sql);
