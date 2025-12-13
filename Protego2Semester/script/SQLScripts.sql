@@ -77,6 +77,7 @@ CREATE TABLE dbo.Certified (
 -- Shift
 CREATE TABLE dbo.Shift (
     shiftId INT IDENTITY(1,1) PRIMARY KEY,
+    shiftDate DATE NOT NULL,
     startTime INT NOT NULL,     -- eks. 800
     endTime INT NOT NULL,       -- eks. 1600
     guardAmount INT NOT NULL,   
@@ -189,11 +190,11 @@ VALUES ('2025-01-01', '2025-12-31', 3, 15000.00, 1, 0, 2);
 ------------------------------
 -- Shifts tied to contract
 ------------------------------
-INSERT INTO Shift (startTime, endTime, guardAmount, availability, shiftLocation, type, contractId, managerId)
+INSERT INTO Shift (shiftDate, startTime, endTime, guardAmount, availability, shiftLocation, type, contractId, managerId)
 VALUES 
-(800, 1600, 2, 1, 'Aarhus', 'Brandvagt',     1, 1),   -- shiftId = 1
-(1200, 2000, 1, 1, 'Odense', 'Vagt',          1, 1),   -- shiftId = 2
-(1000, 1400, 1, 1, 'Aalborg', 'Brandvagt',    1, 1);   -- shiftId = 3
+('2025-03-01', 800, 1600, 2, 1, 'Aarhus', 'Brandvagt', 1, 1),   -- shiftId = 1
+('2025-03-02', 1200, 2000, 1, 1, 'Odense', 'Servicevagt', 1, 1),   -- shiftId = 2
+('2025-03-03', 1000, 1400, 1, 1, 'Aalborg', 'Brandvagt', 1, 1);   -- shiftId = 3
 
 
 ------------------------------
