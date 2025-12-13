@@ -1,3 +1,14 @@
+<<<<<<< Updated upstream
+=======
+/Resources/
+/controller/
+/database/
+/gui/
+/interfaceDB/
+/model/
+/module-info.class
+/test/
+>>>>>>> Stashed changes
 /util/
 /gui/
 /test/
