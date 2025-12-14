@@ -3,31 +3,30 @@ package database;
 import java.sql.*;
 import java.util.ArrayList;
 
-
 import interfaceDB.EmployeeDBIF;
 import model.Employee;
 import model.Shift;
+
 // Jeg syntes at det ser fint ud har ikke kunne spotte nogle mærkelige ting selv har kun fjernet en masse gamle kode.
 public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
 	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employeeId, shiftId) VALUES (?, ?)";
-	
+
 	private static final String GET_ALL_EMPLOYEE_Q = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId";
-	
+
 	private static final String CHECK_EMPLOYEE_EXISTS_Q = "SELECT COUNT(*) FROM Employee WHERE employeeId = ?";
-	
+
 	private static final String GET_SHIFT_INFO_Q = "SELECT availability, contractId FROM Shift WHERE shiftId = ?";
-	
+
 	private static final String COUNT_EMPLOYEES_FOR_SHIFTS_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
-	
+
 	private static final String GET_SHIFT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
-	
+
 	private static final String GET_CONTRACT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
-	
+
 	private static final String CHECK_EMPLOYEE_ALREADY_ASSIGNED_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE employeeId = ? AND shiftId = ?";
-	
-	private static final String GET_EMPLOYEE_BY_ID_Q = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e " + "JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.employeeId = ?";
-	
+
+	private static final String GET_EMPLOYEE_BY_ID_Q = "SELECT e.employeeId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Employee e JOIN Person p ON e.employeeId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE e.employeeId = ?";
 
 	public EmployeeDB() throws DataAccessException {
 		db = DBConnection.getInstance();
@@ -61,10 +60,9 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
-		
+
 		// we get the shiftId
 		final int shiftId = shift.getShiftId();
-	
 
 		Connection con = null;
 		PreparedStatement checkEmployeeStmt = null;
@@ -76,11 +74,10 @@ public class EmployeeDB implements EmployeeDBIF {
 		// at the same time
 		System.out.println("[" + Thread.currentThread().getName() + "] waiting to enter booking section");
 		synchronized (this) {
-			
+
 			// Critical section
 			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
-			
-			
+
 			// ----------------- IMPORTANT! ---------------------------
 			// Here we do a thread sleep to make blocking more visible. We should comment
 			// the line below when we dont want to test
@@ -96,9 +93,9 @@ public class EmployeeDB implements EmployeeDBIF {
 				db.startTransaction(con);
 
 				// 1) Check if employee exists
-				
+
 				checkEmployeeStmt = con.prepareStatement(CHECK_EMPLOYEE_EXISTS_Q);
-				checkEmployeeStmt.setInt(1, employee.getEmployeeId());
+				checkEmployeeStmt.setInt(1, employee.getEmployeeId()); // 1 is the first ? in the prepared statement / sql string
 				try (ResultSet rsEmp = checkEmployeeStmt.executeQuery()) {
 					if (rsEmp.next() && rsEmp.getInt(1) == 0) {
 						throw new DataAccessException(
@@ -109,20 +106,27 @@ public class EmployeeDB implements EmployeeDBIF {
 				// 2) Checks if contract exists and gets contractId + availability for shift
 				checkShiftStmt = con.prepareStatement(GET_SHIFT_INFO_Q);
 				checkShiftStmt.setInt(1, shift.getShiftId());
-				Boolean availability = null;
-				Integer contractId = null;
+				boolean availability;
+				int contractId;
 				try (ResultSet rsShift = checkShiftStmt.executeQuery()) {
-					if (rsShift.next()) {
-						availability = rsShift.getBoolean("availability");
-						// contractId kan være NULL i DB -> læs som Integer
-						contractId = rsShift.getObject("contractId", Integer.class);
-					} else {
+					if (!rsShift.next()) {
 						throw new DataAccessException("Shift does not exist (id=" + shift.getShiftId() + ")", null);
 					}
+					availability = rsShift.getBoolean("availability");
+				    if (rsShift.wasNull()) {
+				        throw new DataAccessException(
+				            "Shift.availability is NULL (shiftId=" + shift.getShiftId() + ")", null);
+				    }
+
+				    contractId = rsShift.getInt("contractId");
+				    if (rsShift.wasNull()) {
+				        throw new DataAccessException(
+				            "Shift has no contract (shiftId=" + shift.getShiftId() + ")", null);
+				}
 				}
 
 				// 3) If the shift is not available, we decline the booking
-				if (availability != null && !availability) {
+				if (!availability) {
 					throw new DataAccessException("Shift is not available (shiftId=" + shift.getShiftId() + ")", null);
 				}
 
@@ -137,39 +141,29 @@ public class EmployeeDB implements EmployeeDBIF {
 				}
 
 				// 5) Sets the effective limit:
-				// If shift is connected to a contract, then it uses contract.guardAmount as limit for bookings on the shift
+				// If shift is connected to a contract, then it uses contract.guardAmount as
+				// limit for bookings on the shift
 				// otherwise we get an error
-				int contractGuardLimit = -1;
-				if (contractId != null && contractId > 0) {
+				int contractGuardLimit;
+				
 					try (PreparedStatement guardStmt = con.prepareStatement(GET_CONTRACT_GUARD_AMOUNT_Q)) {
 						guardStmt.setInt(1, contractId);
 						try (ResultSet rsG = guardStmt.executeQuery()) {
-							if (rsG.next()) {
-								Integer guardAmountObj = rsG.getObject("guardAmount", Integer.class);
-								if (guardAmountObj != null) {
-									contractGuardLimit = guardAmountObj.intValue();
-								} else {
-									throw new DataAccessException(
-											"Contract.guardAmount is not set for contractId=" + contractId, null);
-								}
-							} else {
+							if (!rsG.next()) {
 								throw new DataAccessException(
 										"Referenced contract not found (contractId=" + contractId + ")", null);
 							}
+							contractGuardLimit = rsG.getInt("guardAmount");
+					        if (rsG.wasNull() || contractGuardLimit <= 0) {
+					            throw new DataAccessException(
+					                "Invalid guardAmount for contractId=" + contractId, null);
+								}
+						
+								
+							}
 						}
-					}
-				}
 
-				int effectiveLimit;
-
-				if (contractGuardLimit > 0) {
-				    effectiveLimit = contractGuardLimit;
-				} else {
-				    throw new DataAccessException(
-				        "No valid guard limit found for shiftId=" + shift.getShiftId()
-				        + ". Booking cannot be validated.", null
-				    );
-				}
+				int effectiveLimit = contractGuardLimit;
 
 // ---------------------------------- DEBUG ------------------------------------------------------------------------
 				// (valgfri) diagnostic - kan fjernes når alt er testet
@@ -224,7 +218,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				throw new DataAccessException("Unexpected error while connecting shift to employee: " + e.getMessage(),
 						e);
 			} finally {
-				// Cleanup of resources 
+				// Cleanup of resources
 				try {
 					if (checkEmployeeStmt != null)
 						checkEmployeeStmt.close();
@@ -242,13 +236,15 @@ public class EmployeeDB implements EmployeeDBIF {
 
 			}
 		}
+
 	}
 
 	@Override
 	public Employee getEmployeeId(int employeeId) throws DataAccessException {
 		Employee employee = null;
 
-		try (Connection conn = db.getConnection(); PreparedStatement stmt = conn.prepareStatement(GET_EMPLOYEE_BY_ID_Q)) {
+		try (Connection conn = db.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(GET_EMPLOYEE_BY_ID_Q)) {
 
 			stmt.setInt(1, employeeId);
 
