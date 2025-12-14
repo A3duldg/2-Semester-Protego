@@ -76,8 +76,11 @@ public class EmployeeDB implements EmployeeDBIF {
 		// at the same time
 		System.out.println("[" + Thread.currentThread().getName() + "] waiting to enter booking section");
 		synchronized (this) {
+			
 			// Critical section
 			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
+			
+			
 			// ----------------- IMPORTANT! ---------------------------
 			// Here we do a thread sleep to make blocking more visible. We should comment
 			// the line below when we dont want to test
@@ -86,6 +89,7 @@ public class EmployeeDB implements EmployeeDBIF {
 			} catch (InterruptedException ignored) {
 				Thread.currentThread().interrupt();
 			}
+			// -------------------------------------------------------------------------------------------
 
 			try {
 				con = db.getConnection();
@@ -134,7 +138,7 @@ public class EmployeeDB implements EmployeeDBIF {
 
 				// 5) Sets the effective limit:
 				// If shift is connected to a contract, then it uses contract.guardAmount as limit for bookings on the shift
-				// otherwise we use shift.guardAmount as a fallback 
+				// otherwise we get an error
 				int contractGuardLimit = -1;
 				if (contractId != null && contractId > 0) {
 					try (PreparedStatement guardStmt = con.prepareStatement(GET_CONTRACT_GUARD_AMOUNT_Q)) {
@@ -167,21 +171,22 @@ public class EmployeeDB implements EmployeeDBIF {
 				    );
 				}
 
-
+// ---------------------------------- DEBUG ------------------------------------------------------------------------
 				// (valgfri) diagnostic - kan fjernes når alt er testet
 				System.out.println("DEBUG booking check: shiftId=" + shift.getShiftId() + ", contractId=" + contractId
 						+ ", bookedForThisShift=" + bookedForThisShift + ", effectiveLimit="
 						+ (effectiveLimit == Integer.MAX_VALUE ? "NO_LIMIT" : effectiveLimit));
+// ----------------------------------------------------------------------------------------------------------
 
-				// 6) sammenlign:
-//	         allow hvis bookedForThisShift < effectiveLimit
-//	         afvis hvis bookedForThisShift >= effectiveLimit
+				// 6) Check if the shift is fully booked or not:
+//	         allow if bookedForThisShift < effectiveLimit
+//	         reject if bookedForThisShift >= effectiveLimit
 				if (bookedForThisShift >= effectiveLimit) {
 					throw new DataAccessException(
 							"This shift is fully staffed. No more bookings allowed for this shift.", null);
 				}
 
-				// 7) Check om employee allerede er på shift
+				// 7) Checks if the employee has already booked the shift
 				checkExistingStmt = con.prepareStatement(CHECK_EMPLOYEE_ALREADY_ASSIGNED_Q);
 				checkExistingStmt.setInt(1, employee.getEmployeeId());
 				checkExistingStmt.setInt(2, shift.getShiftId());
@@ -200,7 +205,7 @@ public class EmployeeDB implements EmployeeDBIF {
 					throw new DataAccessException("Insert failed: no rows affected", null);
 				}
 
-				// 9) Commit transaktion
+				// 9) Commit transaction
 				db.commitTransaction(con);
 				System.out.println("Shift assigned successfully: employeeId=" + employee.getEmployeeId() + ", shiftId="
 						+ shift.getShiftId());
@@ -219,7 +224,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				throw new DataAccessException("Unexpected error while connecting shift to employee: " + e.getMessage(),
 						e);
 			} finally {
-				// Oprydning af ressourcer
+				// Cleanup of resources 
 				try {
 					if (checkEmployeeStmt != null)
 						checkEmployeeStmt.close();
