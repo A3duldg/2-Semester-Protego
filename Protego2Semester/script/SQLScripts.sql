@@ -173,19 +173,19 @@ INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
 VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 4);      -- personId = 4
 
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 5);    
+VALUES ('Anna', 'Employee', '44445555', 'emp2@example.com', 'employee', 5);    
 
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 6);    
+VALUES ('Baldwin', 'Employee', '44445555', 'emp2@example.com', 'employee', 6);    
 
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 7);    
+VALUES ('Sofia', 'Employee', '44445555', 'emp2@example.com', 'employee', 7);    
 
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 8);    
+VALUES ('Adam', 'Employee', '44445555', 'emp2@example.com', 'employee', 8);    
 
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 9);    
+VALUES ('Johnny', 'Employee', '44445555', 'emp2@example.com', 'employee', 9);    
 ------------------------------
 -- Manager / Customer / Employee tables
 
