@@ -20,8 +20,6 @@ import model.Shift;
 import database.ShiftDB;
 
 public class IntergrationTest {
-
-	class IntegrationTest {
 	    
 	    private ShiftDB shiftDB;
 	    private ContractDB contractDB;
@@ -141,6 +139,22 @@ public class IntergrationTest {
 	        });
 	    
 	}
+	    @Test
+	    void IT9_ValidConnection() throws DataAccessException {
+	        // Arrange: Gyldig employee og ledig shift
+	        Employee employee = employeeDB.getEmployeeId(20);
+	        Shift shift = new Shift(8, 16, 2, "Test Location", true, 999);
+	        shift.getShiftId(); // Skal være en ledig shift i DB
+	        
+	        assertNotNull(employee, "Employee 1 should exist in database");
+	        
+	        // Act
+	        assertDoesNotThrow(() -> {
+	            employeeController.connectShiftToEmployee(employee, shift);
+	        });
+	        
+	        System.out.println("IT9 - Successfully connected employee to shift");
+	    }
 	 
 	    
 	    @Test
