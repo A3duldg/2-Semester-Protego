@@ -9,10 +9,10 @@ public class DBConnection {
     private static final int POOL_SIZE = 100;
     
     // Connection info
-    private static final String DBNAME = "DMA-CSD-V252_10632062";
+    private static final String DBNAME = "DMA-CSD-V252_10665998";
     private static final String SERVERNAME = "hildur.ucn.dk";
     private static final int PORTNUMBER = 1433;
-    private static final String USERNAME = "DMA-CSD-V252_10632062";
+    private static final String USERNAME = "DMA-CSD-V252_10665998";
     private static final String PASSWORD = "Password1!";
     
     private DBConnection() throws DataAccessException {
