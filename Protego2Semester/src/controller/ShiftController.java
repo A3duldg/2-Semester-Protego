@@ -57,6 +57,13 @@ public class ShiftController {
 
 
 	 public int createShift(Shift shift) throws DataAccessException{
+		// Validate time interval
+		 if (shift.getEndTime() <= shift.getStartTime()) {
+		     throw new IllegalArgumentException(
+		         "End time must be later than start time"
+		     );
+		 }
+
 	        try {
 	            return shiftDB.createShift(shift);
 	        } catch (DataAccessException e) {

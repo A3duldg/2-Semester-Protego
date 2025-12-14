@@ -200,6 +200,15 @@ public class ManagerPage extends JFrame {
             try {
                 int start = Integer.parseInt(txtStartTime.getText().trim());
                 int end = Integer.parseInt(txtEndTime.getText().trim());
+             // ❗ VALIDATION: endTime must be after startTime
+                if (end <= start) {
+                    JOptionPane.showMessageDialog(this,
+                        "End time must be after start time.\nExample: start 1200, end 1600",
+                        "Validation error",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
                 int guards = Integer.parseInt(txtGuardAmount.getText().trim());
                 String location = txtLocation.getText().trim();
                 String type = txtType.getText().trim();
