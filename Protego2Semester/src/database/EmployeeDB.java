@@ -61,7 +61,8 @@ public class EmployeeDB implements EmployeeDBIF {
 
 	@Override
 	public void connectShiftToEmployee(Employee employee, Shift shift) throws DataAccessException {
-		// we get or create a lock for this shift
+		
+		// we get the shiftId
 		final int shiftId = shift.getShiftId();
 	
 
@@ -75,7 +76,7 @@ public class EmployeeDB implements EmployeeDBIF {
 		// at the same time
 		System.out.println("[" + Thread.currentThread().getName() + "] waiting to enter booking section");
 		synchronized (this) {
-			// kritisk sektion
+			// Critical section
 			System.out.println("[" + Thread.currentThread().getName() + " Acquired lock for shiftId=" + shiftId);
 			// ----------------- IMPORTANT! ---------------------------
 			// Here we do a thread sleep to make blocking more visible. We should comment
@@ -90,7 +91,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				con = db.getConnection();
 				db.startTransaction(con);
 
-				// 1) Check om employee findes
+				// 1) Check if employee exists
 				
 				checkEmployeeStmt = con.prepareStatement(CHECK_EMPLOYEE_EXISTS_Q);
 				checkEmployeeStmt.setInt(1, employee.getEmployeeId());
@@ -101,7 +102,7 @@ public class EmployeeDB implements EmployeeDBIF {
 					}
 				}
 
-				// 2) Check om shift findes OG hent contractId + availability for shift
+				// 2) Checks if contract exists and gets contractId + availability for shift
 				checkShiftStmt = con.prepareStatement(GET_SHIFT_INFO_Q);
 				checkShiftStmt.setInt(1, shift.getShiftId());
 				Boolean availability = null;
@@ -116,12 +117,12 @@ public class EmployeeDB implements EmployeeDBIF {
 					}
 				}
 
-				// 3) Hvis shift ikke er available, afviser vi
+				// 3) If the shift is not available, we decline the booking
 				if (availability != null && !availability) {
 					throw new DataAccessException("Shift is not available (shiftId=" + shift.getShiftId() + ")", null);
 				}
 
-				// 4) Tæl bookede employees for DENNE SHIFT
+				// 4) Count the amount of employees booked on this shift
 				int bookedForThisShift = 0;
 				try (PreparedStatement countShiftStmt = con.prepareStatement(COUNT_EMPLOYEES_FOR_SHIFTS_Q)) {
 					countShiftStmt.setInt(1, shift.getShiftId());
@@ -131,9 +132,9 @@ public class EmployeeDB implements EmployeeDBIF {
 					}
 				}
 
-				// 5) Bestem effective limit:
-//	         - hvis shift er knyttet til en contract: brug contract.guardAmount som limit (maks antal bookings for denne shift)
-//	         - ellers fallback til Shift.guardAmount hvis den findes i DB
+				// 5) Sets the effective limit:
+				// If shift is connected to a contract, then it uses contract.guardAmount as limit for bookings on the shift
+				// otherwise we use shift.guardAmount as a fallback 
 				int contractGuardLimit = -1;
 				if (contractId != null && contractId > 0) {
 					try (PreparedStatement guardStmt = con.prepareStatement(GET_CONTRACT_GUARD_AMOUNT_Q)) {
@@ -155,28 +156,17 @@ public class EmployeeDB implements EmployeeDBIF {
 					}
 				}
 
-				// fallback: hvis ingen contractGuardLimit, brug shift.guardAmount fra DB (hvis
-				// tilgængelig)
 				int effectiveLimit;
+
 				if (contractGuardLimit > 0) {
-					effectiveLimit = contractGuardLimit;
+				    effectiveLimit = contractGuardLimit;
 				} else {
-					Integer shiftGuardObj = null;
-					try (PreparedStatement shiftGuardStmt = con.prepareStatement(GET_SHIFT_GUARD_AMOUNT_Q)) {
-						shiftGuardStmt.setInt(1, shift.getShiftId());
-						try (ResultSet rsS = shiftGuardStmt.executeQuery()) {
-							if (rsS.next()) {
-								shiftGuardObj = rsS.getObject("guardAmount", Integer.class);
-							}
-						}
-					}
-					if (shiftGuardObj != null && shiftGuardObj > 0) {
-						effectiveLimit = shiftGuardObj.intValue();
-					} else {
-						// ingen limit fundet => ingen begrænsning
-						effectiveLimit = Integer.MAX_VALUE;
-					}
+				    throw new DataAccessException(
+				        "No valid guard limit found for shiftId=" + shift.getShiftId()
+				        + ". Booking cannot be validated.", null
+				    );
 				}
+
 
 				// (valgfri) diagnostic - kan fjernes når alt er testet
 				System.out.println("DEBUG booking check: shiftId=" + shift.getShiftId() + ", contractId=" + contractId
