@@ -200,11 +200,17 @@ public class ManagerPage extends JFrame {
             try {
                 int start = Integer.parseInt(txtStartTime.getText().trim());
                 int end = Integer.parseInt(txtEndTime.getText().trim());
-             // ❗ VALIDATION: endTime must be after startTime
-                if (end <= start) {
+                if (!isValidHHmm(start) || !isValidHHmm(end)) {
                     JOptionPane.showMessageDialog(this,
-                        "End time must be after start time.\nExample: start 1200, end 1600",
-                        "Validation error",
+                        "Tid skal være HHmm (fx 0800 eller 1600) og minutter < 60.",
+                        "Validation",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                if (hhmmToMinutes(end) <= hhmmToMinutes(start)) {
+                    JOptionPane.showMessageDialog(this,
+                        "End time must be after start time.",
+                        "Validation",
                         JOptionPane.WARNING_MESSAGE);
                     return;
                 }
@@ -320,6 +326,15 @@ public class ManagerPage extends JFrame {
             combo.setEnabled(false);
             JOptionPane.showMessageDialog(this, "Error loading contracts: " + dae.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    private boolean isValidHHmm(int t) {
+        int h = t / 100;
+        int m = t % 100;
+        return h >= 0 && h <= 23 && m >= 0 && m <= 59;
+    }
+
+    private int hhmmToMinutes(int hhmm) {
+        return (hhmm / 100) * 60 + (hhmm % 100);
     }
 }
 

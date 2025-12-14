@@ -128,15 +128,34 @@ public class ShiftController {
 	}
 
 	public int calculateTotalHours(ArrayList<Shift> shifts) {
-		int totalHours = 0;
+	    if (shifts == null || shifts.isEmpty()) {
+	        return 0;
+	    }
 
-		// Implementering af en Lambda der beregner timerne for hver vagt
-		for (Shift shift : shifts) {
-			totalHours += (shift.getEndTime() - shift.getStartTime());
-		}
+	    int totalMinutes = 0;
 
-		return totalHours;
+	    for (Shift shift : shifts) {
+	        int start = shift.getStartTime();
+	        int end = shift.getEndTime();
+
+	        if (!isValidHHmm(start) || !isValidHHmm(end)) {
+	            throw new IllegalArgumentException("Invalid time format (HHmm).");
+	        }
+
+	        int startMin = hhmmToMinutes(start);
+	        int endMin = hhmmToMinutes(end);
+
+	        if (endMin <= startMin) {
+	            throw new IllegalArgumentException("End time must be after start time.");
+	        }
+
+	        totalMinutes += (endMin - startMin);
+	    }
+
+	    return totalMinutes / 60;
 	}
+
+	
 
 	public void addToProcessing(Shift shift) {
 		synchronized (shiftLock) {
@@ -219,5 +238,17 @@ public class ShiftController {
 	 public int countEmployeesForShift(int shiftId) throws DataAccessException {
 	        return shiftDB.countEmployeesForShift(shiftId);
 	    }
+	 private boolean isValidHHmm(int t) {
+		    int hh = t / 100;
+		    int mm = t % 100;
+		    return (hh >= 0 && hh <= 23) && (mm >= 0 && mm <= 59);
+		}
+
+		private int hhmmToMinutes(int t) {
+		    int hh = t / 100;
+		    int mm = t % 100;
+		    return hh * 60 + mm;
+		}
+
 	 
 }
