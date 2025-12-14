@@ -350,4 +350,53 @@ class UnitTest {
         //allShifts.forEach(...) -> giver NullPointerException på null
         assertThrows(NullPointerException.class, () -> sc.findAvailableShifts(null));
     }
+ // UT11–UT14: ShiftController.calculateTotalHours(List<Shift> shifts)
+
+    @Test
+    void UT11_oneShift_8Hours_returns8() throws Exception {
+        ShiftController sc = new ShiftController();
+
+        ArrayList<Shift> shifts = new ArrayList<>();
+        shifts.add(new Shift(800, 1600, 1, "Aarhus", true, -1)); // 08:00 -> 16:00 = 8 timer
+
+        int total = sc.calculateTotalHours(shifts);
+
+        assertEquals(8, total);
+    }
+
+    @Test
+    void UT12_moreShifts_returns12() throws Exception {
+        ShiftController sc = new ShiftController();
+
+        ArrayList<Shift> shifts = new ArrayList<>();
+        shifts.add(new Shift(800, 1600, 1, "Aarhus", true, -1));   // 8 timer
+        shifts.add(new Shift(1600, 2000, 1, "Aarhus", true, -1));  // 4 timer
+
+        int total = sc.calculateTotalHours(shifts);
+
+        assertEquals(12, total);
+    }
+
+    @Test
+    void UT13_emptyList_returns0() throws Exception {
+        ShiftController sc = new ShiftController();
+
+        ArrayList<Shift> shifts = new ArrayList<>();
+
+        int total = sc.calculateTotalHours(shifts);
+
+        assertEquals(0, total);
+    }
+
+    @Test
+    void UT14_invalidTimes_throwsException() throws Exception {
+        ShiftController sc = new ShiftController();
+
+        ArrayList<Shift> shifts = new ArrayList<>();
+        shifts.add(new Shift(1200, 1100, 1, "Test", true, -1)); // end før start = invalid
+
+        assertThrows(IllegalArgumentException.class, () -> sc.calculateTotalHours(shifts));
+    }
+
 }
+
