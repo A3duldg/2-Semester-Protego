@@ -9,11 +9,7 @@ import model.Contract;
 public class ContractDB implements ContractDBIF {
 	//private final DBConnection db;
 
-	private static final String FIND_CONTRACT_BY_ID_Q = "SELECT contractId, guardAmount, startDate, endDate, active, confirmed FROM Contract WHERE contractId = ?";
-	
-	private static final String FIND_ACTIVE_CONTRACT_BY_ID_Q = "SELECT contractId FROM Contract WHERE active = 1";
-	
-	private static final String CONFIRM_CONTRACT_Q = "UPDATE Contract SET confirmed = 1 WHERE contractId = ?";
+	private static final String FIND_CONTRACT_BY_ID_Q = "SELECT contractId, guardAmount, startDate, endDate, active FROM Contract WHERE contractId = ?";
 	
 	private static final String COUNT_BOOKED_GUARDS_FOR_CONTRACT_Q = "SELECT COUNT(*) FROM EmployeeShift es JOIN Shift s ON es.shiftId = s.shiftId WHERE s.contractId = ?";
 	
@@ -48,7 +44,6 @@ public class ContractDB implements ContractDBIF {
 	                if (ed != null) contract.setEndDate(ed.toLocalDate());
 
 	                contract.setActive(rs.getBoolean("active"));
-	                contract.setConfirmed(rs.getBoolean("confirmed"));
 	            }
 	        }
 	    } catch (SQLException e) {
@@ -61,46 +56,6 @@ public class ContractDB implements ContractDBIF {
 	
 	}
 
-	@Override
-	public Contract confirmContract() throws DataAccessException {
-		Contract contract = null;
-
-		 try (Connection con = DBConnection.getInstance().getConnection()) {
-	            boolean oldAutoCommit = con.getAutoCommit();
-	            con.setAutoCommit(false);
-	            try (PreparedStatement findStmt = con.prepareStatement(FIND_ACTIVE_CONTRACT_BY_ID_Q, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-	                 ResultSet rs = findStmt.executeQuery()) {
-
-	                if (rs.next()) {
-	                    Integer id = rs.getObject("contractId", Integer.class);
-	                    if (id != null) {
-	                        try (PreparedStatement confirmStmt = con.prepareStatement(CONFIRM_CONTRACT_Q)) {
-	                            confirmStmt.setInt(1, id);
-	                            int updated = confirmStmt.executeUpdate();
-	                            if (updated > 0) {
-	                                contract = new Contract(id);
-	                            } else {
-	                                con.rollback();
-	                                System.err.println("confirmContract: UPDATE påvirkede 0 rækker for contractId=" + id);
-	                            }
-	                        }
-	                    } else {
-	                        System.err.println("confirmContract: fundet aktiv kontrakt-række uden contractId");
-	                    }
-	                }
-	                con.commit();
-	            } catch (SQLException e) {
-	                con.rollback();
-	                throw e;
-	            } finally {
-	                con.setAutoCommit(oldAutoCommit);
-	            }
-	        } catch (SQLException e) {
-	            throw new DataAccessException("Error confirming contract", e);
-	        }
-
-	        return contract;
-	}
 
 	public int countBookedGuardsForContract(int contractId) throws DataAccessException {
 		try (Connection con = DBConnection.getInstance().getConnection();

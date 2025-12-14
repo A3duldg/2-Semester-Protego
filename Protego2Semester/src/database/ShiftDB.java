@@ -80,7 +80,6 @@ public class ShiftDB implements ShiftDBIF {
 			    stmt.setNull(1, java.sql.Types.DATE);
 			}
 
-			stmt.setDate(1, java.sql.Date.valueOf(shift.getShiftDate()));
 			stmt.setInt(2, shift.getStartTime()); 
 			stmt.setInt(3, shift.getEndTime());
 			stmt.setInt(4, shift.getGuardAmount()); 

@@ -10,14 +10,13 @@ public class Contract {
 	private LocalDate endDate;
 	private int guardAmount;
 	private boolean active;
-	private boolean confirmed;
 	private String type;
 	public Contract(int contractId) {
 		
 	
 		this.contractId = contractId;
 		this.active = true;
-		this.confirmed = true;
+		
 	}
 
 	public Contract(int contractId, int employeeId, LocalDate startDate, LocalDate endDate, boolean active,
@@ -47,7 +46,6 @@ public class Contract {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.active = active;
-		this.confirmed = confirmed;
 		this.guardAmount = guardAmount;
 	}
 	public String getType() {
@@ -83,10 +81,6 @@ public class Contract {
 		return active;
 	}
 
-	public boolean isConfirmed() {
-		return confirmed;
-	}
-	
 	public void setGuardAmount(int guardAmount) {
 		if (guardAmount <= 0) {
 			throw new IllegalArgumentException("There needs to be at least 1 or more guards needed");
@@ -125,14 +119,6 @@ public class Contract {
 		this.active = active;
 	}
 
-	public void setConfirmed(boolean confirmed) {
-		this.confirmed = confirmed;
-	}
-	
-	public Contract confirmContract() {
-		this.confirmed = true;
-		return this;
-	}
 	//Deaktiver contract
 	public void deactivate() {
 		this.active = false;
@@ -166,7 +152,7 @@ public class Contract {
 	    
 	    @Override
 	    public String toString() {
-	        return String.format("Contract[id=%d, employeeId=%d, start=%s, end=%s, active=%b, confirmed=%b]",
-	            contractId, employeeId, startDate, endDate, active, confirmed);
+	        return String.format("Contract[id=%d, employeeId=%d, start=%s, end=%s, active=%b]",
+	            contractId, employeeId, startDate, endDate, active);
 	    }
 }

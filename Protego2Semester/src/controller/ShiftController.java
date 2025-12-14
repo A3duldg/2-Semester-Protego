@@ -76,15 +76,6 @@ public class ShiftController {
 	    }
 
 
-	 public Contract confirmContract() {
-	        try {
-	            return contractCtr.confirmContract();
-	        } catch (DataAccessException e) {
-	            e.printStackTrace();
-	            return null;
-	        }
-	    }
-
 	 // observer har ændre småt nogle ting, for at få den til at notificere observer.
 	 public boolean bookShift(Shift shift) {
 	        try {

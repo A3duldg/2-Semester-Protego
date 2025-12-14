@@ -60,7 +60,6 @@ CREATE TABLE dbo.Contract (
     guardAmount INT NULL,         -- antal vagter som kontrakten kræver per shift (max)
     estimatedPrice DECIMAL(10,2) NULL,
     active BIT DEFAULT 0,
-    confirmed BIT DEFAULT 0,
     customerId INT NULL,          -- reference til kunde
     CONSTRAINT FK_Contract_Customer FOREIGN KEY (customerId) REFERENCES dbo.Customer(customerId)
 );
@@ -182,8 +181,8 @@ INSERT INTO Employee (employeeId) VALUES (4);
 ------------------------------
 -- Contract for the customer
 ------------------------------
-INSERT INTO Contract (startDate, endDate, guardAmount, estimatedPrice, active, confirmed, customerId)
-VALUES ('2025-01-01', '2025-12-31', 3, 15000.00, 1, 0, 2);  
+INSERT INTO Contract (startDate, endDate, guardAmount, estimatedPrice, active, customerId)
+VALUES ('2025-01-01', '2025-12-31', 3, 15000.00, 1, 2);  
 -- contractId = 1
 
 

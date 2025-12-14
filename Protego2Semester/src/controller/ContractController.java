@@ -16,10 +16,7 @@ public class ContractController {
 	public Contract findActiveContract(int contractId) throws DataAccessException {
 		return contractDB.findActiveContract(contractId);
 	}
-	public Contract confirmContract() throws DataAccessException {
-		return contractDB.confirmContract();
-	}
-	
+
 	public Contract findContractById(int contractId) throws DataAccessException {
 		return contractDB.findContractById(contractId);
 	}
