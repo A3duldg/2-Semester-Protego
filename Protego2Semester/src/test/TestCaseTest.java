@@ -13,7 +13,7 @@ import database.ContractDB;
 import database.DataAccessException;
 import model.*;
 
-class JunitTest {
+class TestCaseTest {
 
 	private Shift shift;
 	private ShiftController controller;

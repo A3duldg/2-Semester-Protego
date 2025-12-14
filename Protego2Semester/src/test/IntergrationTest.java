@@ -1,12 +1,12 @@
-package IntegrationTest;
+package test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,12 +15,11 @@ import controller.EmployeeController;
 import database.ContractDB;
 import database.DataAccessException;
 import database.EmployeeDB;
+import model.Employee;
 import model.Shift;
 import database.ShiftDB;
 
-public class ItTest {
-
-	class IntegrationTests {
+public class IntergrationTest {
 	    
 	    private ShiftDB shiftDB;
 	    private ContractDB contractDB;
@@ -44,7 +43,7 @@ public class ItTest {
 	        boolean availability = true;
 	        
 	        // Act
-	        List<Shift> availableShifts = shiftDB.findShiftByAvailability(availability);
+	        ArrayList<Shift> availableShifts = shiftDB.findShiftByAvailability(availability);
 	        
 	        // Assert
 	        assertNotNull(availableShifts, "Should return a list, not null");
@@ -60,7 +59,7 @@ public class ItTest {
 	        boolean availability = false;
 	        
 	        // Act
-	        List<Shift> bookedShifts = shiftDB.findShiftByAvailability(availability);
+	        ArrayList<Shift> bookedShifts = shiftDB.findShiftByAvailability(availability);
 	        
 	        // Assert
 	        assertNotNull(bookedShifts, "Should return a list, not null");
@@ -76,7 +75,7 @@ public class ItTest {
 	        boolean availability = true;
 	        
 	        // Act
-	        List<Shift> shifts = shiftDB.findShiftByAvailability(availability);
+	        ArrayList<Shift> shifts = shiftDB.findShiftByAvailability(availability);
 	        
 	        // Assert
 	        assertNotNull(shifts, "Should return empty list, not null");
@@ -88,8 +87,8 @@ public class ItTest {
 	    void IT4_DatabaseConnectionError() {
 	        // This is hard to test without closing the database but can verify that the method handles exceptions
 	        assertDoesNotThrow(() -> {
-	            List<Shift> shifts = shiftDB.findShiftByAvailability(true);
-	            assertNotNull(shifts, "Should handle errors");
+	            ArrayList<Shift> shifts = shiftDB.findShiftByAvailability(true);
+	            assertNotNull(shifts, "Should handle errors the right way");
 	        });
 	    }
 	    
@@ -138,6 +137,81 @@ public class ItTest {
 	            int count = contractDB.countBookedGuardsForContract(0);
 	            assertEquals(0, count, "Contract 0 should return 0");
 	        });
+	    
+	}
+	    @Test
+	    void IT9_ValidConnection() throws DataAccessException {
+	        // Arrange: Gyldig employee og ledig shift
+	        Employee employee = employeeDB.getEmployeeId(20);
+	        Shift shift = new Shift(8, 16, 2, "Test Location", true, 999);
+	        shift.getShiftId(); // Skal være en ledig shift i DB
+	        
+	        assertNotNull(employee, "Employee 1 should exist in database");
+	        
+	        // Act
+	        assertDoesNotThrow(() -> {
+	            employeeController.connectShiftToEmployee(employee, shift);
+	        });
+	        
+	        System.out.println("IT9 - Successfully connected employee to shift");
+	    }
+	 
+	    
+	    @Test
+	    void IT10_EmployeeNull() {
+	        // Arrange Null employee
+	        Employee employee = null;
+	        Shift shift = new Shift(8, 16, 2, "Test", true, 1);
+	        
+	        // Act & Assert
+	        assertDoesNotThrow(() -> {
+	            employeeController.connectShiftToEmployee(employee, shift);
+	        }, "Should handle null employee the right way");
+	    }
+	    
+	    @Test
+	    void IT11_ShiftNull() throws DataAccessException {
+	        // Arrange found employee, null shift
+	        Employee employee = employeeDB.getEmployeeId(1);
+	        Shift shift = null;
+	        
+	        // Act & Assert
+	        assertDoesNotThrow(() -> {
+	            employeeController.connectShiftToEmployee(employee, shift);
+	        }, "Should handle null shift the right way");
+	    }
+	    
+	    @Test
+	    void IT12_ShiftAlreadyAssigned() throws DataAccessException {
+	        // Arrange Shift is allready booked
+	        Employee employee1 = employeeDB.getEmployeeId(1);
+	        Employee employee2 = employeeDB.getEmployeeId(2);
+	        Shift shift = new Shift(8, 16, 2, "Test", true, 1);
+	        
+	        // Book first time
+	        try {
+	            employeeController.connectShiftToEmployee(employee1, shift);
+	        } catch (Exception e) {
+	            // Ignore if already booked
+	        }
+	        
+	        // Act & Assert - Try to book again
+	        assertThrows(IllegalStateException.class, () -> {
+	            employeeController.connectShiftToEmployee(employee2, shift);
+	        }, "Should throw exception when shift is already assigned");
+	    }
+	    
+	    @Test
+	    void IT13_EmployeeNotInDatabase() {
+	        // Arrange Employee that is not in the database
+	        Employee fakeEmployee = new Employee(-1, "Fake", "User", 
+	            "Address", "City", 1234, "12345678", "fake@email.com");
+	        Shift shift = new Shift(8, 16, 2, "Test", true, 1);
+	        
+	        // Act & Assert
+	        assertThrows(IllegalStateException.class, () -> {
+	            employeeController.connectShiftToEmployee(fakeEmployee, shift);
+	        }, "Should throw exception when employee doesn't exist");
 	    }
 	}
 }

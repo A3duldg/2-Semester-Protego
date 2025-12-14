@@ -86,12 +86,13 @@ public class ShiftDB implements ShiftDBIF {
 			stmt.setString(5, shift.getShiftLocation()); 
 			stmt.setString(6, shift.getType()); 
 			stmt.setBoolean(7, shift.isAvailable()); 
-			int cid = shift.getContract(); if (cid > 0) 
-		    stmt.setInt(8, cid); 
-			else stmt.setNull(8, java.sql.Types.INTEGER);
-
+			int cid = shift.getContract(); 
+			if (cid <= 0) {
+				throw new IllegalArgumentException("Shift must be linked to a contract");
+			}
+		    stmt.setInt(8, cid);
 	        int rows = stmt.executeUpdate();
-
+	        
 	        if (rows > 0) {
 	            try (ResultSet rs = stmt.getGeneratedKeys()) {
 	                if (rs.next()) {

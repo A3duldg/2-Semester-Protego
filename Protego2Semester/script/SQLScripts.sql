@@ -83,7 +83,7 @@ CREATE TABLE dbo.Shift (
     availability BIT DEFAULT 1,
     shiftLocation NVARCHAR(255) NULL,
     [type] NVARCHAR(100) NULL,
-    contractId INT NULL,
+    contractId INT NOT NULL,
     managerId INT NULL,
     certifiedId INT NULL,
     CONSTRAINT FK_Shift_Contract FOREIGN KEY (contractId) REFERENCES dbo.Contract(contractId),
@@ -145,7 +145,12 @@ INSERT INTO AddressCityPostal ([address], city, postalNr)
 VALUES ('Manager Street 1', 'Aarhus', 8000),       -- addressId = 1
        ('Customer Road 5', 'Odense', 5000),        -- addressId = 2
        ('Employee Lane 10', 'Aalborg', 9000),      -- addressId = 3
-       ('Employee Lane 12', 'Aalborg', 9000);      -- addressId = 4
+       ('Employee Lane 12', 'Aalborg', 9000),      -- addressId = 4
+       ('Employee Lane 13', 'Aalborg', 9000),      -- addressId = 5
+       ('Employee Lane 14', 'Aalborg', 9000),      -- addressId = 6
+       ('Employee Lane 15', 'Aalborg', 9000),      -- addressId = 7
+       ('Employee Lane 16', 'Aalborg', 9000),      -- addressId = 8
+       ('Employee Lane 17', 'Aalborg', 9000);      -- addressId = 9
 
 
 ------------------------------
@@ -167,7 +172,20 @@ VALUES ('Erik', 'Employee', '22223333', 'emp1@example.com', 'employee', 3);     
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
 VALUES ('Eva', 'Employee', '44445555', 'emp2@example.com', 'employee', 4);      -- personId = 4
 
+INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
+VALUES ('Anna', 'Employee', '44445555', 'emp2@example.com', 'employee', 5);    
 
+INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
+VALUES ('Baldwin', 'Employee', '44445555', 'emp2@example.com', 'employee', 6);    
+
+INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
+VALUES ('Sofia', 'Employee', '44445555', 'emp2@example.com', 'employee', 7);    
+
+INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
+VALUES ('Adam', 'Employee', '44445555', 'emp2@example.com', 'employee', 8);    
+
+INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
+VALUES ('Johnny', 'Employee', '44445555', 'emp2@example.com', 'employee', 9);    
 ------------------------------
 -- Manager / Customer / Employee tables
 

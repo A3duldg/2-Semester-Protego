@@ -1,7 +1,10 @@
-/database/
+/IntegrationTest/
+/Resources/
 /controller/
+/database/
+/gui/
 /interfaceDB/
 /model/
+/module-info.class
 /test/
-/gui/
 /util/
