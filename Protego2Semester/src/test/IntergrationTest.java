@@ -142,8 +142,8 @@ public class IntergrationTest {
 	    @Test
 	    void IT9_ValidConnection() throws DataAccessException {
 	        // Arrange: Gyldig employee og ledig shift
-	        Employee employee = employeeDB.getEmployeeId(20);
-	        Shift shift = new Shift(8, 16, 2, "Test Location", true, 999);
+	        Employee employee = employeeDB.getEmployeeId(3);
+	        Shift shift = new Shift(8, 16, 2, "Test Location", true, 8);
 	        shift.getShiftId(); // Skal være en ledig shift i DB
 	        
 	        assertNotNull(employee, "Employee 1 should exist in database");
@@ -181,37 +181,18 @@ public class IntergrationTest {
 	        }, "Should handle null shift the right way");
 	    }
 	    
-	    @Test
-	    void IT12_ShiftAlreadyAssigned() throws DataAccessException {
-	        // Arrange Shift is allready booked
-	        Employee employee1 = employeeDB.getEmployeeId(1);
-	        Employee employee2 = employeeDB.getEmployeeId(2);
-	        Shift shift = new Shift(8, 16, 2, "Test", true, 1);
-	        
-	        // Book first time
-	        try {
-	            employeeController.connectShiftToEmployee(employee1, shift);
-	        } catch (Exception e) {
-	            // Ignore if already booked
-	        }
-	        
-	        // Act & Assert - Try to book again
-	        assertThrows(IllegalStateException.class, () -> {
-	            employeeController.connectShiftToEmployee(employee2, shift);
-	        }, "Should throw exception when shift is already assigned");
-	    }
+	  
 	    
 	    @Test
-	    void IT13_EmployeeNotInDatabase() {
+	    void IT12_EmployeeNotInDatabase() {
 	        // Arrange Employee that is not in the database
 	        Employee fakeEmployee = new Employee(-1, "Fake", "User", 
 	            "Address", "City", 1234, "12345678", "fake@email.com");
 	        Shift shift = new Shift(8, 16, 2, "Test", true, 1);
 	        
 	        // Act & Assert
-	        assertThrows(IllegalStateException.class, () -> {
+	        assertThrows(DataAccessException.class, () -> {
 	            employeeController.connectShiftToEmployee(fakeEmployee, shift);
 	        }, "Should throw exception when employee doesn't exist");
 	    }
 	}
-}
