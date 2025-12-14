@@ -1,4 +1,4 @@
-package IntegrationTest;
+package test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,7 +19,7 @@ import model.Employee;
 import model.Shift;
 import database.ShiftDB;
 
-public class ItTest {
+public class IntergrationTest {
 
 	class IntegrationTest {
 	    
