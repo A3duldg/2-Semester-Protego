@@ -122,7 +122,7 @@ public class EmployeeDB implements EmployeeDBIF {
 				    if (rsShift.wasNull()) {
 				        throw new DataAccessException(
 				            "Shift has no contract (shiftId=" + shift.getShiftId() + ")", null);
-				}
+				    }
 				}
 
 				// 3) If the shift is not available, we decline the booking
@@ -165,16 +165,9 @@ public class EmployeeDB implements EmployeeDBIF {
 
 				int effectiveLimit = contractGuardLimit;
 
-// ---------------------------------- DEBUG ------------------------------------------------------------------------
-				// (valgfri) diagnostic - kan fjernes når alt er testet
-				System.out.println("DEBUG booking check: shiftId=" + shift.getShiftId() + ", contractId=" + contractId
-						+ ", bookedForThisShift=" + bookedForThisShift + ", effectiveLimit="
-						+ (effectiveLimit == Integer.MAX_VALUE ? "NO_LIMIT" : effectiveLimit));
-// ----------------------------------------------------------------------------------------------------------
-
 				// 6) Check if the shift is fully booked or not:
-//	         allow if bookedForThisShift < effectiveLimit
-//	         reject if bookedForThisShift >= effectiveLimit
+				// allow if bookedForThisShift < effectiveLimit
+				// reject if bookedForThisShift >= effectiveLimit
 				if (bookedForThisShift >= effectiveLimit) {
 					throw new DataAccessException(
 							"This shift is fully staffed. No more bookings allowed for this shift.", null);
