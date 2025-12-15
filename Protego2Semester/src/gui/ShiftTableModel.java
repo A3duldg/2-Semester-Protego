@@ -18,7 +18,7 @@ public class ShiftTableModel extends AbstractTableModel {
 	private final HashMap<Integer, Integer> guardCache = new HashMap<>();
 
 	private ArrayList<Shift> data = new ArrayList<>();
-	private static final String[] COL_NAMES = { "ID", "Date", "Start", "End", "Guards", "Location", "Type", "Available",
+	private static final String[] COL_NAMES = { "ID", "Date", "Start", "End", "GuardAmount", "Location", "Type", "Available",
 			"Staffing" };
 
 	private final ShiftController shiftController;
