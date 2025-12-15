@@ -78,7 +78,7 @@ public class ManagerPage extends JFrame {
 		try {
 		    this.contractController = new ContractController();
 		} catch (DataAccessException e) {
-		    // Hvis vi ikke kan forbinde til DB, gem null og håndter det senere i loadContractsIntoCombo.
+			// If we cannot connect to the database, store null and handle it later in loadContractsIntoCombo
 		    this.contractController = null;
 		    System.err.println("ManagerPage: Could not initialize ContractController: " + e.getMessage());
 		}
@@ -202,7 +202,7 @@ public class ManagerPage extends JFrame {
                 int end = Integer.parseInt(txtEndTime.getText().trim());
                 if (!isValidHHmm(start) || !isValidHHmm(end)) {
                     JOptionPane.showMessageDialog(this,
-                        "Tid skal være HHmm (fx 0800 eller 1600) og minutter < 60.",
+                        "Time must be in (e.g., 0800 eller 1600) minutes must be < 60.",
                         "Validation",
                         JOptionPane.WARNING_MESSAGE);
                     return;
@@ -247,7 +247,7 @@ public class ManagerPage extends JFrame {
                     shiftDate = LocalDate.parse(raw, fmt);
                 } catch (DateTimeParseException dte) {
                     JOptionPane.showMessageDialog(this,
-                        "Dato skal være dd/MM-yyyy, fx 14/12-2025",
+                        "Date must be dd/MM-yyyy, e.g. 14/12-2025",
                         "Validation",
                         JOptionPane.WARNING_MESSAGE);
                     return;
@@ -258,14 +258,14 @@ public class ManagerPage extends JFrame {
 
                 if (cs != null && shiftDate.isBefore(cs)) {
                     JOptionPane.showMessageDialog(this,
-                        "Shift-dato er før kontraktens start: " + cs,
+                    	"The selected shift date is before the contract start date." + cs,
                         "Validation",
                         JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 if (ce != null && shiftDate.isAfter(ce)) {
                     JOptionPane.showMessageDialog(this,
-                        "Shift-dato er efter kontraktens slut: " + ce,
+                    	"The selected shift date is after the contract end date." + ce,
                         "Validation",
                         JOptionPane.WARNING_MESSAGE);
                     return;
