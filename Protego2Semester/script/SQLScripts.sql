@@ -144,7 +144,7 @@ CREATE TABLE dbo.Report (
 INSERT INTO AddressCityPostal ([address], city, postalNr)
 VALUES ('Manager Street 1', 'Aarhus', 8000),       -- addressId = 1
        ('Customer Road 5', 'Odense', 5000),        -- addressId = 2
-       ('Employee Lane 10', 'Aalborg', 9000),      -- addressId = 3
+       ('Employee Lane 10', 'Albertslund', 2620),      -- addressId = 3
        ('Employee Lane 12', 'Aalborg', 9000),      -- addressId = 4
        ('Employee Lane 13', 'Aalborg', 9000),      -- addressId = 5
        ('Employee Lane 14', 'Aalborg', 9000),      -- addressId = 6
@@ -166,7 +166,7 @@ VALUES ('Carla', 'Customer', '87654321', 'customer@example.com', 'customer', 2);
 
 -- Employee 1
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
-VALUES ('Erik', 'Employee', '22223333', 'emp1@example.com', 'employee', 3);     -- personId = 3
+VALUES ('Jon', 'Nielsen', '22223333', 'emp1@example.com', 'employee', 3);     -- personId = 3
 
 -- Employee 2
 INSERT INTO Person (firstName, lastName, phone, email, personType, addressId)
