@@ -28,8 +28,8 @@ public class Shift extends AbstractSubject {
 		this.shiftId = shiftId;
 	
 		
-
-	// initialisering af certifications listen & hard coding af brand vagt typen
+	
+		// initializing of certifications list & hard coding of brand vagt type
 		certifications = new ArrayList<>();
 		certifications.add("Brandvagt");
 		certifications.add("Servicevagt");
@@ -40,9 +40,10 @@ public class Shift extends AbstractSubject {
 
 	}
 	
-	// if statementen er til for at sikre at type eksistere inden i listen og så
-	// hvis den gør sætte typen vi har valgt til type og returnerer true ellers
-	// returnerer false.
+	// The if statement is used to ensure that the type exists within the list,
+	// and if it does, set the chosen type to that type and return true;
+	// otherwise, return false.
+
 	public boolean setShiftType(String type) {
 		if (certifications.contains(type)) {
 			this.type = type;
@@ -56,14 +57,12 @@ public class Shift extends AbstractSubject {
 		return type;
 	}
 
-	// getter til shiftId.
+
 	public int getShiftId() {
 		return shiftId;
 	}
 
-	// dette er kun fordi jeg tænker det vil give mening men kan fjernes det er bare
-	// sådan at man kan tilfører en ny certifications hvis der skulle opstå en
-	// mangel.
+
 	public void addCertification(String Certifications) {
 		certifications.add(Certifications);
 	}
@@ -120,13 +119,13 @@ public class Shift extends AbstractSubject {
 
 	public void setAvailability(boolean availability) {
 		this.availability = availability;
-		notifyObservers(); //observerting
+		notifyObservers(); //observer
 	}
 
 	public boolean bookShift() {
 		if (availability) {
 			availability = false;
-			notifyObservers(); //observerting
+			notifyObservers(); //observer
 			return true;
 		}
 		return false;

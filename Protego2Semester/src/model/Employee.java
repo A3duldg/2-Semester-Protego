@@ -89,7 +89,7 @@ public class Employee implements Observer {
 		return employeeId;
 	}
 
-	// bare en almen adder til en liste af vagter en employee har.
+
 	public void connectShiftToEmployee(Shift shift) {
 		if (shift == null) {
 			throw new IllegalArgumentException("må ikke være null");
@@ -100,7 +100,7 @@ public class Employee implements Observer {
 		shifts.add(shift);
 	}
 
-// her er nogle ting som hører til observerPattern.
+// observerPattern.
 	@Override
 	public void updateObserver() {
 		relevantShifts();
@@ -108,7 +108,7 @@ public class Employee implements Observer {
 	}
 
 	public void attachShift(Shift shift) {
-		shift.attachObserver(this); // Shift er Subject
+		shift.attachObserver(this); // Shift is Subject
 		observedShifts.add(shift);
 	}
 

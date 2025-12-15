@@ -11,17 +11,17 @@ public class Contract {
 	private int guardAmount;
 	private boolean active;
 	private String type;
+
 	public Contract(int contractId) {
-		
-	
+
 		this.contractId = contractId;
 		this.active = true;
-		
+
 	}
 
 	public Contract(int contractId, int employeeId, LocalDate startDate, LocalDate endDate, boolean active,
 			boolean confirmed, int guardAmount) {
-		//Validation
+		// Validation
 		if (contractId <= 0) {
 			throw new IllegalArgumentException("Contract ID must be positive");
 		}
@@ -48,15 +48,15 @@ public class Contract {
 		this.active = active;
 		this.guardAmount = guardAmount;
 	}
+
 	public String getType() {
 		return type;
 	}
-	
-	
+
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public int getGuardAmount() {
 		return guardAmount;
 	}
@@ -87,13 +87,13 @@ public class Contract {
 		}
 		this.guardAmount = guardAmount;
 	}
-	
+
 	public void setEmployeeId(int employeeId) {
-        if (employeeId <= 0) {
-            throw new IllegalArgumentException("Employee ID must be bigger than 0");
-        }
-        this.employeeId = employeeId;
-    }
+		if (employeeId <= 0) {
+			throw new IllegalArgumentException("Employee ID must be bigger than 0");
+		}
+		this.employeeId = employeeId;
+	}
 
 	public void setEndDate(LocalDate endDate) {
 		if (endDate == null) {
@@ -119,40 +119,45 @@ public class Contract {
 		this.active = active;
 	}
 
-	//Deaktiver contract
+	// Deactivates contract
 	public void deactivate() {
 		this.active = false;
 	}
-	//Tjekker om contract er gyldig på en bestemt dato
+
+	// checks if contract is valid on a specific date
 	public boolean isValidOn(LocalDate date) {
 		if (date == null || !active) {
-            return false;
-        }
-        return !date.isBefore(startDate) && !date.isAfter(endDate);
+			return false;
+		}
+		return !date.isBefore(startDate) && !date.isAfter(endDate);
 	}
-	//Tjekker om Contact er udløbet
-	 public boolean isExpired() {
-	        if (endDate == null) {
-	            return false;
-	        }
-	        return LocalDate.now().isAfter(endDate);
-	    }
-	 @Override
-	    public boolean equals(Object obj) {
-	        if (this == obj) return true;
-	        if (obj == null || getClass() != obj.getClass()) return false;
-	        Contract contract = (Contract) obj;
-	        return contractId == contract.contractId;
-	    }
-	    
-	    @Override
-	    public int hashCode() {
-	        return Objects.hash(contractId);
-	    }
-	    
-	    @Override
-	    public String toString() {
-	        return String.format("Contract[id=%d, employeeId=%d, start=%s, end=%s, active=%b]",
-	            contractId, employeeId, startDate, endDate, active);
-	    }
+
+	// Checks if Contact is expired
+	public boolean isExpired() {
+		if (endDate == null) {
+			return false;
+		}
+		return LocalDate.now().isAfter(endDate);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Contract contract = (Contract) obj;
+		return contractId == contract.contractId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(contractId);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Contract[id=%d, employeeId=%d, start=%s, end=%s, active=%b]", contractId, employeeId,
+				startDate, endDate, active);
+	}
 }
