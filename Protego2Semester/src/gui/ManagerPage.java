@@ -86,7 +86,7 @@ public class ManagerPage extends JFrame {
 		try {
 
 		ShiftController shiftController = new ShiftController();
-		List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
+		ArrayList<Shift> availableShifts = shiftController.findShiftByAvailability(true);
 		shiftTableModel.setData(availableShifts);
 		} catch (DataAccessException e) {
 		    JOptionPane.showMessageDialog(this,
@@ -285,7 +285,7 @@ public class ManagerPage extends JFrame {
                     JOptionPane.showMessageDialog(this, "Shift created with id: " + newId, "Success", JOptionPane.INFORMATION_MESSAGE);
                     // Refresh table
                     try {
-                        List<Shift> updatedList = controller.findShiftByAvailability(true);
+                        ArrayList<Shift> updatedList = controller.findShiftByAvailability(true);
                         shiftTableModel.setData(updatedList);
                     } catch (DataAccessException dae) {
                         JOptionPane.showMessageDialog(this, "Error refreshing shifts: " + dae.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);

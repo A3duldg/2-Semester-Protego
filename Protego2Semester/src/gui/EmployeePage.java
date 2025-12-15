@@ -65,7 +65,7 @@ public class EmployeePage extends JFrame {
 
 		try {
 			ShiftController shiftController = new ShiftController();
-			List<Shift> availableShifts = shiftController.findShiftByAvailability(true);
+			ArrayList<Shift> availableShifts = shiftController.findShiftByAvailability(true);
 			shiftTableModel.setData(availableShifts);
 		} catch (DataAccessException e) {
 			JOptionPane.showMessageDialog(this, "Error loading shifts: " + e.getMessage());
@@ -172,7 +172,7 @@ public class EmployeePage extends JFrame {
 	private void refreshShiftTable() {
 		try {
 			ShiftController shiftController = new ShiftController();
-			List<Shift> updatedShifts = shiftController.findShiftByAvailability(true);
+			ArrayList<Shift> updatedShifts = shiftController.findShiftByAvailability(true);
 			shiftTableModel.setData(updatedShifts);
 			shiftTableModel.fireTableDataChanged();
 		} catch (DataAccessException e) {
