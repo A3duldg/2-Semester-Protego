@@ -11,7 +11,7 @@ IF OBJECT_ID('dbo.Manager', 'U') IS NOT NULL DROP TABLE dbo.Manager;
 IF OBJECT_ID('dbo.Employee', 'U') IS NOT NULL DROP TABLE dbo.Employee;
 IF OBJECT_ID('dbo.Person', 'U') IS NOT NULL DROP TABLE dbo.Person;
 IF OBJECT_ID('dbo.AddressCityPostal', 'U') IS NOT NULL DROP TABLE dbo.AddressCityPostal;
--- IF (Retunere ID'et for databaseobjekt)(dbo er standard schema i sql, U = vi leder efter objekter af typen user tabel, så en tabel oprettet af brugeren)
+-- IF (returns id for database object)(dbo is standard for a schema in sql, U = we are looking for an object of the type user tabel, so a table created by the user)
 
 -- AddressCityPostal
 CREATE TABLE dbo.AddressCityPostal (
@@ -35,19 +35,19 @@ CREATE TABLE dbo.Person (
 
 -- Employee (PK = employeeId) references Person(personId)
 CREATE TABLE dbo.Employee (
-    employeeId INT PRIMARY KEY, -- IKKE identity: skal matche Person.personId
+    employeeId INT PRIMARY KEY, -- Not identity: needs to match Person.personId
     CONSTRAINT FK_Employee_Person FOREIGN KEY (employeeId) REFERENCES dbo.Person(personId)
 );
 
 -- Manager (PK = managerId) references Person(personId)
 CREATE TABLE dbo.Manager (
-    managerId INT PRIMARY KEY, -- ikke identity; matcher Person.personId
+    managerId INT PRIMARY KEY, -- Not identity: needs to match Person.personId
     CONSTRAINT FK_Manager_Person FOREIGN KEY (managerId) REFERENCES dbo.Person(personId)
 );
 
 -- Customer (PK = customerId) references Person(personId)
 CREATE TABLE dbo.Customer (
-    customerId INT PRIMARY KEY, -- ikke identity; matcher Person.personId
+    customerId INT PRIMARY KEY, -- Not identity: needs to match Person.personId
     firm NVARCHAR(255) NULL,
     CONSTRAINT FK_Customer_Person FOREIGN KEY (customerId) REFERENCES dbo.Person(personId)
 );
@@ -57,10 +57,10 @@ CREATE TABLE dbo.Contract (
     contractId INT IDENTITY(1,1) PRIMARY KEY,
     startDate DATE NULL,
     endDate DATE NULL,
-    guardAmount INT NULL,         -- antal vagter som kontrakten kræver per shift (max)
+    guardAmount INT NULL,         --  amount of guards that is needed pr. shift (max)
     estimatedPrice DECIMAL(10,2) NULL,
     active BIT DEFAULT 0,
-    customerId INT NULL,          -- reference til kunde
+    customerId INT NULL,          -- reference to customer
     CONSTRAINT FK_Contract_Customer FOREIGN KEY (customerId) REFERENCES dbo.Customer(customerId)
 );
 
@@ -77,8 +77,8 @@ CREATE TABLE dbo.Certified (
 CREATE TABLE dbo.Shift (
     shiftId INT IDENTITY(1,1) PRIMARY KEY,
     shiftDate DATE NOT NULL,
-    startTime INT NOT NULL,     -- eks. 800
-    endTime INT NOT NULL,       -- eks. 1600
+    startTime INT NOT NULL,     -- example 1000
+    endTime INT NOT NULL,       -- example 1600
     guardAmount INT NOT NULL,   
     availability BIT DEFAULT 1,
     shiftLocation NVARCHAR(255) NULL,
@@ -134,8 +134,8 @@ CREATE TABLE dbo.Report (
 );
 
 
---TESTDATA INSERT FOR NY DATABASESTRUKTUR
--- Indeholder: 1 manager, 1 customer, 2 employees
+--TESTDATA
+-- Contains: 1 manager, 1 customer, 2 employees
 ---------------------------------------------------------
 
 ------------------------------
