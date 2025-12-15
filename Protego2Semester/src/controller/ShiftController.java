@@ -16,11 +16,11 @@ public class ShiftController {
 	private ContractController contractCtr;
 	private ShiftDBIF shiftDB;
 
-	// Tråd sikker liste til vagter der er under behandling
+	// Thread safe list to track shifts under processing.
 	private final ArrayList<Shift> processingShifts;
 	private final Object shiftLock = new Object();
 
-	// Tråd sikker tæller
+	// Thread safe counter
 	private int totalShiftsCreated = 0;
 	private final Object counterLock = new Object();
 
@@ -59,9 +59,7 @@ public class ShiftController {
 	 public int createShift(Shift shift) throws DataAccessException{
 		// Validate time interval
 		 if (shift.getEndTime() <= shift.getStartTime()) {
-		     throw new IllegalArgumentException(
-		         "End time must be later than start time"
-		     );
+		     throw new IllegalArgumentException("End time must be later than start time");
 		 }
 
 	        try {
@@ -83,7 +81,7 @@ public class ShiftController {
 	    }
 
 
-	 // observer har ændre småt nogle ting, for at få den til at notificere observer.
+	// The observer has been slightly modified to ensure it notifies the observer.
 	 public boolean bookShift(Shift shift) {
 	        try {
 	            boolean result = shiftDB.bookShift(shift);
@@ -108,7 +106,7 @@ public class ShiftController {
 	public ArrayList<Shift> findAvailableShifts(ArrayList<Shift> allShifts) {
 		ArrayList<Shift> available = new ArrayList<>();
 
-		// Implementering Lambda for hver vagt, tjek om den er ledig
+		// Lambda implementation to check availability for each shift.
 		allShifts.forEach(shift -> {
 			if (shift.isAvailable()) {
 				available.add(shift);
@@ -121,7 +119,7 @@ public class ShiftController {
 	public ArrayList<Shift> sortShiftsByStartTime(ArrayList<Shift> shifts) {
 		ArrayList<Shift> sorted = new ArrayList<>(shifts);
 
-		// Implementing af en funktion som skal sortere vagter udfra starttider
+		// Function implementation to sort shifts based on start times.
 		sorted.sort((shift1, shift2) -> Integer.compare(shift1.getStartTime(), shift2.getStartTime()));
 
 		return sorted;
@@ -182,17 +180,17 @@ public class ShiftController {
 		}
 	}
 
-	// Producer consumer der opretter flere vagter og ligger dem ud
+	// Producer consumer that creates multiple shifts and distributes them.
 	public void bulkShiftCreation(ArrayList<Shift> shifts) {
 		System.out.println("Starter oprettelse af " + shifts.size() + "vagter");
 
-		// Producer som tilføjer flere vagter til en liste
+		// Producer adds additional shifts to the list.
 		Thread producer = new Thread(() -> {
 			for (Shift shift : shifts) {
 				addToProcessing(shift);
 
 				try {
-					Thread.sleep(100);// Sættes til 100 millisekunder de den skal arbejde hurtigere end
+					Thread.sleep(100);// Set to 100 milliseconds because it should work faster
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -200,7 +198,7 @@ public class ShiftController {
 			System.out.println("Oprettelse færdig.");
 		});
 
-		// Consumer tager vagterne og opretter dem
+		// The consumer takes the shifts and creates them.
 		Thread consumer = new Thread(() -> {
 			int processed = 0;
 			while (processed < shifts.size()) {
@@ -213,16 +211,16 @@ public class ShiftController {
 						System.out.println("Shift created" + id);
 					} catch (DataAccessException e) {
 						System.err.println("Error in creation of shift: " + e.getMessage());
-					} // Skulle være en transaction
+					} // Should be a transaction.
 					processed++;
 				}
 				try {
-					Thread.sleep(200); // Skal ligne database forsinkelse
+					Thread.sleep(200); // Should simulate a database delay.
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-			System.out.println("Oprettelse færdig");
+			System.out.println("Creation completed");
 		});
 		producer.start();
 		consumer.start();
@@ -233,7 +231,7 @@ public class ShiftController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Oprettelse og udgivelse færdig. Totale vagter: " + getTotalShiftsCreated());
+		System.out.println("Creation and release finished. total shifts: " + getTotalShiftsCreated());
 	}
 	 public int countEmployeesForShift(int shiftId) throws DataAccessException {
 	        return shiftDB.countEmployeesForShift(shiftId);

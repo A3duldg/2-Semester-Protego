@@ -39,7 +39,7 @@ public class EmployeeController {
 	        ArrayList<Employee> allEmployees = getAllEmployees();
 	        if (allEmployees != null) {
 	            for (Employee e : allEmployees) {
-	                shift.attachObserver(e); // Employee implementerer Observer
+	                shift.attachObserver(e); // Employee implements Observer
 	            }
 	        }
 	    }
