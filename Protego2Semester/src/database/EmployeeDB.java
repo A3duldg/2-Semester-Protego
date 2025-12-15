@@ -7,7 +7,7 @@ import interfaceDB.EmployeeDBIF;
 import model.Employee;
 import model.Shift;
 
-// Jeg syntes at det ser fint ud har ikke kunne spotte nogle mærkelige ting selv har kun fjernet en masse gamle kode.
+
 public class EmployeeDB implements EmployeeDBIF {
 	private final DBConnection db;
 	private static final String CONNECT_SHIFT_TO_EMPLOYEE_Q = "INSERT INTO EmployeeShift (employeeId, shiftId) VALUES (?, ?)";
@@ -19,8 +19,6 @@ public class EmployeeDB implements EmployeeDBIF {
 	private static final String GET_SHIFT_INFO_Q = "SELECT availability, contractId FROM Shift WHERE shiftId = ?";
 
 	private static final String COUNT_EMPLOYEES_FOR_SHIFTS_Q = "SELECT COUNT(*) FROM EmployeeShift WHERE shiftId = ?";
-
-	private static final String GET_SHIFT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
 
 	private static final String GET_CONTRACT_GUARD_AMOUNT_Q = "SELECT guardAmount FROM Contract WHERE contractId = ?";
 

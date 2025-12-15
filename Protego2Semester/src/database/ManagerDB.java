@@ -8,7 +8,7 @@ import java.sql.*;
 public class ManagerDB implements ManagerDBIF {
 
 	private final DBConnection db;
-	
+
 	private static final String FIND_MANAGER_BY_ID = "SELECT m.managerId, p.firstName, p.lastName, p.phone, p.email, a.address, a.city, a.postalNr FROM Manager m JOIN Person p ON m.managerId = p.personId JOIN AddressCityPostal a ON p.addressId = a.addressId WHERE m.managerId = ?";
 
 	public ManagerDB() throws DataAccessException {
@@ -55,8 +55,8 @@ public class ManagerDB implements ManagerDBIF {
 			} catch (Exception ignored) {
 			}
 			if (conn != null) {
-	            db.releaseConnection(conn);
-	        }
+				db.releaseConnection(conn);
+			}
 		}
 
 		return manager;

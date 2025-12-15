@@ -7,7 +7,7 @@ import interfaceDB.ContractDBIF;
 import model.Contract;
 
 public class ContractDB implements ContractDBIF {
-	//private final DBConnection db;
+
 
 	private static final String FIND_CONTRACT_BY_ID_Q = "SELECT contractId, guardAmount, startDate, endDate, active FROM Contract WHERE contractId = ?";
 	
@@ -21,7 +21,7 @@ public class ContractDB implements ContractDBIF {
 	
 	public ContractDB() throws DataAccessException {
 
-		//db = DBConnection.getInstance();
+
 	}
 
 	public Contract findContractById(int contractId) throws DataAccessException {
@@ -47,7 +47,7 @@ public class ContractDB implements ContractDBIF {
 	            }
 	        }
 	    } catch (SQLException e) {
-	        // Print fuld JDBC-fejl til konsol for at finde root-cause, så vi kan fixe den præcist.
+	    	// Print the full JDBC error to the console to identify the root cause, so we can fix it precisely.
 		    System.err.println("ContractDB.findContractById: SQLException: " + e.getMessage());
 		    e.printStackTrace(System.err);
 	        throw new DataAccessException("Error finding contract", e);
@@ -137,7 +137,7 @@ public class ContractDB implements ContractDBIF {
 	    }
 	    return list;
 	}
-	//nyt
+
 	public ArrayList<Contract> findAllActiveContracts() throws DataAccessException {
 	    ArrayList<Contract> list = new ArrayList<>();
 
